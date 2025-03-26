@@ -11,7 +11,7 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "https://zippy-zabaione-9f9cb5.netlify.app")
+@CrossOrigin(origins = "https://soft-semifreddo-e326ea.netlify.app")
 public class AuthenticationController {
 
   private final AuthenticationService service;
