@@ -11,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/documents")
+@CrossOrigin(origins = "https://zippy-zabaione-9f9cb5.netlify.app")
 public class DocumentController {
 
     private final DocumentService documentService;
