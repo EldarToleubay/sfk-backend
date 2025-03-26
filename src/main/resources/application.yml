@@ -4,7 +4,6 @@ spring:
     username: postgres
     password: dtyHnMdaOnuipMZXbvcwntORMdpUwHZx
     driver-class-name: org.postgresql.Driver
-
     hikari:
       auto-commit: false
   jpa:
@@ -20,6 +19,7 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
+
 
 application:
   security:
