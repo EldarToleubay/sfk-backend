@@ -12,7 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("api/v1/news")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "https://soft-semifreddo-e326ea.netlify.app")
+@CrossOrigin(origins = "https://skffront.netlify.app")
 public class NewsController {
     private final NewsService newsService;
 
