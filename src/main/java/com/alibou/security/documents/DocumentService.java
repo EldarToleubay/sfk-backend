@@ -1,5 +1,6 @@
 package com.alibou.security.documents;
 
+import com.alibou.security.dto.response.DocumentResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,8 +31,8 @@ public class DocumentService {
     }
 
 
-    public List<DocumentEntity> getDocuments() {
-        return documentRepository.findAll();
+    public List<DocumentResponse> getDocuments() {
+        return documentRepository.findAllBy();
     }
 
 
@@ -60,7 +61,7 @@ public class DocumentService {
         return documentRepository.save(document);
     }
 
-    public List<DocumentEntity> getDocumentsByType(DocumentType documentType) {
+    public List<DocumentResponse> getDocumentsByType(DocumentType documentType) {
         return documentRepository.findByDocumentType(documentType);
     }
 }

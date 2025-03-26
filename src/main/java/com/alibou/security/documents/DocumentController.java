@@ -1,5 +1,6 @@
 package com.alibou.security.documents;
 
+import com.alibou.security.dto.response.DocumentResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +36,7 @@ public class DocumentController {
     }
 
     @GetMapping("/all")
-    public List<DocumentEntity> getDocuments(@RequestParam(required = false) DocumentType documentType) {
+    public List<DocumentResponse> getDocuments(@RequestParam(required = false) DocumentType documentType) {
         if (documentType == null) {
             return documentService.getDocuments();
         }
