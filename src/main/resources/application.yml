@@ -1,8 +1,13 @@
+#spring:
+#  datasource:
+#    url: jdbc:postgresql://hopper.proxy.rlwy.net:15601/railway
+#    username: postgres
+#    password: dtyHnMdaOnuipMZXbvcwntORMdpUwHZx
 spring:
   datasource:
-    url: jdbc:postgresql://hopper.proxy.rlwy.net:15601/railway
-    username: postgres
-    password: dtyHnMdaOnuipMZXbvcwntORMdpUwHZx
+    url: jdbc:postgresql://localhost:5432/sf_adminpanel
+    username: sf_admin
+    password: admin
     driver-class-name: org.postgresql.Driver
     hikari:
       auto-commit: false
@@ -19,6 +24,7 @@ spring:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
+      enabled: true
 
 
 application:
@@ -33,6 +39,11 @@ file:
     path: /documents
 
 
+minio:
+  url: https://bucket-production-f3af.up.railway.app:443
+  accessKey: prX6NbIzkAabISpgrdUWSLmlnwHa5hP7
+  secretKey: QEWj0MEbxzFSaoKJqQuAI0If6JqNIPZydRBm6ZScj8CLb49A
+  bucket: test-bucket
 
 
 
