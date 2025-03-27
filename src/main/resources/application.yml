@@ -44,6 +44,11 @@ minio:
   accessKey: prX6NbIzkAabISpgrdUWSLmlnwHa5hP7
   secretKey: QEWj0MEbxzFSaoKJqQuAI0If6JqNIPZydRBm6ZScj8CLb49A
   bucket: test-bucket
+logging:
+  file:
+    name: mylog.log
+
+
 
 
 
