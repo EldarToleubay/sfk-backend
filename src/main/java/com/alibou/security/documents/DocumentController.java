@@ -1,13 +1,11 @@
 package com.alibou.security.documents;
 
-import com.alibou.security.dto.response.DocumentResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -22,40 +20,33 @@ public class DocumentController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<DocumentEntity> uploadDocument(@RequestParam String title, @RequestParam DocumentType documentType, @RequestParam MultipartFile file) throws IOException {
+    public ResponseEntity<DocumentEntity> uploadDocument(
+            @RequestParam String title,
+            @RequestParam DocumentType documentType,
+            @RequestParam MultipartFile file) throws Exception {
         return ResponseEntity.ok(documentService.saveDocument(title, documentType, file));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<byte[]> getDocument(@PathVariable Long id) {
-        DocumentEntity document = documentService.getDocument(id);
+    public ResponseEntity<byte[]> downloadDocument(@PathVariable Long id) throws Exception {
+        byte[] fileData = documentService.getDocument(id);
         return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_PDF)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getFileName() + "\"")
-                .body(document.getFileData());
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"document\"")
+                .body(fileData);
     }
 
     @GetMapping("/all")
-    public List<DocumentResponse> getDocuments(@RequestParam(required = false) DocumentType documentType) {
+    public List<DocumentEntity> getDocuments(@RequestParam(required = false) DocumentType documentType) {
         if (documentType == null) {
-            return documentService.getDocuments();
+            return documentService.getDocumentsByType(documentType);
         }
         return documentService.getDocumentsByType(documentType);
     }
 
-
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDocument(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteDocument(@PathVariable Long id) throws Exception {
         documentService.deleteDocument(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<DocumentEntity> updateDocument(
-            @PathVariable Long id,
-            @RequestParam String title,
-            @RequestParam DocumentType documentType,
-            @RequestParam(required = false) MultipartFile file) throws IOException {
-        return ResponseEntity.ok(documentService.updateDocument(id, title, documentType, file));
     }
 }

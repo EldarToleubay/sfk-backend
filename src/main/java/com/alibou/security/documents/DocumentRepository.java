@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> {
 
-    List<DocumentResponse> findByDocumentType(DocumentType documentType);
+    List<DocumentEntity> findByDocumentType(DocumentType documentType);
 
     List<DocumentResponse> findAllBy();
 

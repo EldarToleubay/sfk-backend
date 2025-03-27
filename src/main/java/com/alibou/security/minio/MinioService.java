@@ -4,7 +4,6 @@ import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.GetObjectArgs;
 import io.minio.RemoveObjectArgs;
-import io.minio.errors.MinioException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,7 +22,7 @@ public class MinioService {
         this.minioClient = minioClient;
     }
 
-    public void uploadFile(String filename, MultipartFile file) throws Exception {
+    public String uploadFile(String filename, MultipartFile file) throws Exception {
         minioClient.putObject(
                 PutObjectArgs.builder()
                         .bucket(bucketName)
@@ -32,6 +31,7 @@ public class MinioService {
                         .contentType(file.getContentType())
                         .build()
         );
+        return filename;
     }
 
     public InputStream getFile(String filename) throws Exception {

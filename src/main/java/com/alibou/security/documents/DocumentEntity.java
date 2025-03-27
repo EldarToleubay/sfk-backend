@@ -3,6 +3,7 @@ package com.alibou.security.documents;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -20,17 +21,19 @@ public class DocumentEntity {
     @Column(nullable = false)
     private String fileName;
 
-
-    @Column(nullable = false)
-    private LocalDateTime uploadDate = LocalDateTime.now();
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private DocumentType documentType;
 
-    @Lob
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime uploadDate;
+
     @Column(nullable = false)
-    private byte[] fileData;
+    private String filePath; // Теперь тут просто название файла
+
+    @Column(nullable = false)
+    private String fileType;
 
 }
 
