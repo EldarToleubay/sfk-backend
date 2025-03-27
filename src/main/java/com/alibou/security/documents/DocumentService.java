@@ -76,4 +76,8 @@ public class DocumentService {
         document.setTitle(newTitle);
         return documentRepository.save(document);
     }
+
+    public List<DocumentEntity> getDocuments() {
+        return documentRepository.findAll();
+    }
 }

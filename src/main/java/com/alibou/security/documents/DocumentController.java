@@ -38,10 +38,10 @@ public class DocumentController {
 
     @GetMapping("/all")
     public List<DocumentEntity> getDocuments(@RequestParam(required = false) DocumentType documentType) {
-        if (documentType == null) {
+        if (documentType != null) {
             return documentService.getDocumentsByType(documentType);
         }
-        return documentService.getDocumentsByType(documentType);
+        return documentService.getDocuments();
     }
 
     @DeleteMapping("/{id}")
