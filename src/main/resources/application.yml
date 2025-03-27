@@ -1,13 +1,13 @@
-#spring:
-#  datasource:
-#    url: jdbc:postgresql://hopper.proxy.rlwy.net:15601/railway
-#    username: postgres
-#    password: dtyHnMdaOnuipMZXbvcwntORMdpUwHZx
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/sf_adminpanel
-    username: sf_admin
-    password: admin
+    url: jdbc:postgresql://hopper.proxy.rlwy.net:15601/railway
+    username: postgres
+    password: dtyHnMdaOnuipMZXbvcwntORMdpUwHZx
+#spring:
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/sf_adminpanel
+#    username: sf_admin
+#    password: admin
     driver-class-name: org.postgresql.Driver
     hikari:
       auto-commit: false
