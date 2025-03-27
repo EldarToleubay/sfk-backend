@@ -1,9 +1,6 @@
 package com.alibou.security.minio;
 
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
-import io.minio.GetObjectArgs;
-import io.minio.RemoveObjectArgs;
+import io.minio.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,4 +48,14 @@ public class MinioService {
                         .build()
         );
     }
+
+    public StatObjectResponse getFileMetadata(String filePath) throws Exception {
+        return minioClient.statObject(
+                StatObjectArgs.builder()
+                        .bucket(bucketName)
+                        .object(filePath)
+                        .build()
+        );
+    }
+
 }

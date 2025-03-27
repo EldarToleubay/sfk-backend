@@ -29,12 +29,9 @@ public class DocumentController {
 
     @GetMapping("/{id}")
     public ResponseEntity<byte[]> downloadDocument(@PathVariable Long id) throws Exception {
-        byte[] fileData = documentService.getDocument(id);
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"document\"")
-                .body(fileData);
+        return documentService.getDocument(id); // Просто возвращаем ResponseEntity напрямую
     }
+
 
     @GetMapping("/all")
     public List<DocumentEntity> getDocuments(@RequestParam(required = false) DocumentType documentType) {

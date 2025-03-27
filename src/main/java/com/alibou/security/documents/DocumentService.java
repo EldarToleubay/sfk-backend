@@ -2,8 +2,12 @@ package com.alibou.security.documents;
 
 import com.alibou.security.dto.response.DocumentResponse;
 import com.alibou.security.minio.MinioService;
+import com.google.common.net.HttpHeaders;
+import io.minio.StatObjectResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,17 +42,30 @@ public class DocumentService {
     }
 
 
-    public byte[] getDocument(Long id) throws Exception {
+    public ResponseEntity<byte[]> getDocument(Long id) throws Exception {
         DocumentEntity document = documentRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Документ с id {} не найден", id);
                     return new RuntimeException("Документ не найден");
                 });
 
+        // Получаем метаданные файла
+        StatObjectResponse stat = minioService.getFileMetadata(document.getFilePath());
+        String contentType = stat.contentType(); // Получаем Content-Type
+
+        // Читаем сам файл
+        byte[] fileBytes;
         try (InputStream inputStream = minioService.getFile(document.getFilePath())) {
-            return inputStream.readAllBytes(); // Преобразуем InputStream в byte[]
+            fileBytes = inputStream.readAllBytes();
         }
+
+        // Возвращаем файл с Content-Type
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getFileName() + "\"")
+                .body(fileBytes);
     }
+
 
 
     public void deleteDocument(Long id) throws Exception {
