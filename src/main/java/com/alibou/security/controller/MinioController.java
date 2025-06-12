@@ -1,5 +1,6 @@
-package com.alibou.security.minio;
+package com.alibou.security.controller;
 
+import com.alibou.security.service.MinioService;
 import com.google.common.net.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
