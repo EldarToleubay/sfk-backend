@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://hopper.proxy.rlwy.net:15601/railway
+    url: jdbc:postgresql://postgres:kbUpnqjAtOvJgitGTUeijUrSwCPrPZhC@crossover.proxy.rlwy.net:51973/railway
     username: postgres
-    password: dtyHnMdaOnuipMZXbvcwntORMdpUwHZx
+    password: kbUpnqjAtOvJgitGTUeijUrSwCPrPZhC
 #spring:
 #  datasource:
 #    url: jdbc:postgresql://localhost:5432/sf_adminpanel
