@@ -1,4 +1,4 @@
-package com.alibou.security.service;
+package com.alibou.security.minio;
 
 import io.minio.*;
 import org.springframework.beans.factory.annotation.Value;
