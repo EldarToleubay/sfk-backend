@@ -22,12 +22,8 @@ public class DrugService {
 
     private final DrugRepository drugRepository;
 
-
-    private final EntityManager entityManager;
-
     private static final int BATCH_SIZE = 1000;
 
-    @Transactional
     public void importExcel(MultipartFile file) throws Exception {
         try (InputStream is = file.getInputStream();
              Workbook workbook = new XSSFWorkbook(is)) {
@@ -35,43 +31,45 @@ public class DrugService {
             Sheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rows = sheet.iterator();
 
-            if (rows.hasNext()) rows.next(); // Пропустить заголовок
+            if (rows.hasNext()) rows.next(); // пропускаем заголовок
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
             int rowNum = 1;
 
             List<Drug> batch = new ArrayList<>();
+            List<String> errors = new ArrayList<>();
 
             while (rows.hasNext()) {
-                Row currentRow = rows.next();
+                Row row = rows.next();
                 rowNum++;
 
                 try {
                     Drug drug = new Drug();
-                    drug.setYear(getIntCell(currentRow, 0, rowNum, "year"));
-                    drug.setSegment(getStringCell(currentRow, 1, rowNum, "segment"));
-                    drug.setTradeName(getStringCell(currentRow, 2, rowNum, "tradeName"));
-                    drug.setManufacturingCompany(getStringCell(currentRow, 3, rowNum, "manufacturingCompany"));
-                    drug.setPersonWithTradingLicense(getStringCell(currentRow, 4, rowNum, "personWithTradingLicense"));
-                    drug.setPersonInterestedInRegistrationGeorgiaStand(getStringCell(currentRow, 5, rowNum, "personInterestedInRegistrationGeorgiaStand"));
-                    drug.setInterestedParty(getStringCell(currentRow, 6, rowNum, "interestedParty"));
-                    drug.setRxOtc(getStringCell(currentRow, 7, rowNum, "rxOtc"));
-                    drug.setModeOfRegistration(getStringCell(currentRow, 8, rowNum, "modeOfRegistration"));
-                    drug.setSku(getStringCell(currentRow, 9, rowNum, "sku"));
-                    drug.setDrugForm(getStringCell(currentRow, 10, rowNum, "drugForm"));
-                    drug.setDosage(getStringCell(currentRow, 11, rowNum, "dosage"));
-                    drug.setPackQuantity(getStringCell(currentRow, 12, rowNum, "packQuantity"));
-                    drug.setInn(getStringCell(currentRow, 13, rowNum, "inn"));
-                    drug.setAtc1(getStringCell(currentRow, 14, rowNum, "atc1"));
-                    drug.setAtc2(getStringCell(currentRow, 15, rowNum, "atc2"));
-                    drug.setAtc3(getStringCell(currentRow, 16, rowNum, "atc3"));
-                    drug.setVolumeInUnits(getBigDecimalCell(currentRow, 17, rowNum, "volumeInUnits"));
-                    drug.setPricePerUnitLari(getBigDecimalCell(currentRow, 18, rowNum, "pricePerUnitLari"));
-                    drug.setPricePerUnitUsd(getBigDecimalCell(currentRow, 19, rowNum, "pricePerUnitUsd"));
-                    drug.setValueInGel(getBigDecimalCell(currentRow, 20, rowNum, "valueInGel"));
-                    drug.setValueInUsd(getBigDecimalCell(currentRow, 21, rowNum, "valueInUsd"));
 
-                    Cell dateCell = currentRow.getCell(22);
+                    drug.setYear(getIntCell(row, 0, rowNum, "year"));
+                    drug.setSegment(getStringCell(row, 1, rowNum, "segment"));
+                    drug.setTradeName(getStringCell(row, 2, rowNum, "tradeName"));
+                    drug.setManufacturingCompany(getStringCell(row, 3, rowNum, "manufacturingCompany"));
+                    drug.setPersonWithTradingLicense(getStringCell(row, 4, rowNum, "personWithTradingLicense"));
+                    drug.setPersonInterestedInRegistrationGeorgiaStand(getStringCell(row, 5, rowNum, "personInterestedInRegistrationGeorgiaStand"));
+                    drug.setInterestedParty(getStringCell(row, 6, rowNum, "interestedParty"));
+                    drug.setRxOtc(getStringCell(row, 7, rowNum, "rxOtc"));
+                    drug.setModeOfRegistration(getStringCell(row, 8, rowNum, "modeOfRegistration"));
+                    drug.setSku(getStringCell(row, 9, rowNum, "sku"));
+                    drug.setDrugForm(getStringCell(row, 10, rowNum, "drugForm"));
+                    drug.setDosage(getStringCell(row, 11, rowNum, "dosage"));
+                    drug.setPackQuantity(getStringCell(row, 12, rowNum, "packQuantity"));
+                    drug.setInn(getStringCell(row, 13, rowNum, "inn"));
+                    drug.setAtc1(getStringCell(row, 14, rowNum, "atc1"));
+                    drug.setAtc2(getStringCell(row, 15, rowNum, "atc2"));
+                    drug.setAtc3(getStringCell(row, 16, rowNum, "atc3"));
+                    drug.setVolumeInUnits(getBigDecimalCell(row, 17, rowNum, "volumeInUnits"));
+                    drug.setPricePerUnitLari(getBigDecimalCell(row, 18, rowNum, "pricePerUnitLari"));
+                    drug.setPricePerUnitUsd(getBigDecimalCell(row, 19, rowNum, "pricePerUnitUsd"));
+                    drug.setValueInGel(getBigDecimalCell(row, 20, rowNum, "valueInGel"));
+                    drug.setValueInUsd(getBigDecimalCell(row, 21, rowNum, "valueInUsd"));
+
+                    Cell dateCell = row.getCell(22);
                     if (dateCell != null) {
                         if (dateCell.getCellType() == CellType.NUMERIC) {
                             drug.setImportDate(dateCell.getLocalDateTimeCellValue().toLocalDate());
@@ -80,32 +78,47 @@ public class DrugService {
                         }
                     }
 
-                    drug.setPriceSource(getStringCell(currentRow, 23, rowNum, "priceSource"));
+                    drug.setPriceSource(getStringCell(row, 23, rowNum, "priceSource"));
 
                     batch.add(drug);
 
                     if (batch.size() == BATCH_SIZE) {
-                        saveBatch(batch);
+                        drugRepository.saveAll(batch);
                         batch.clear();
                     }
 
                 } catch (Exception e) {
-                    System.err.printf("Ошибка в строке %d: %s%n", rowNum, e.getMessage());
-                    e.printStackTrace();
+                    errors.add("Ошибка в строке " + rowNum + ": " + e.getMessage());
                 }
             }
 
-            // финальная пачка
+            // Сохраняем оставшиеся записи
             if (!batch.isEmpty()) {
-                saveBatch(batch);
+                drugRepository.saveAll(batch);
             }
+
+            System.out.println("Импорт завершён. Ошибок: " + errors.size());
+            errors.forEach(System.out::println);
         }
     }
 
-    private void saveBatch(List<Drug> batch) {
-        drugRepository.saveAll(batch);
-        entityManager.flush();
-        entityManager.clear(); // освобождаем память
+    private String getCellAsString(Cell cell) {
+        if (cell == null) return null;
+
+        return switch (cell.getCellType()) {
+            case STRING -> cell.getStringCellValue().trim();
+            case NUMERIC -> {
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    yield cell.getDateCellValue().toString();
+                }
+                double val = cell.getNumericCellValue();
+                yield (val == Math.floor(val)) ? String.valueOf((long) val) : String.valueOf(val);
+            }
+            case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
+            case FORMULA -> cell.getCellFormula();
+            case BLANK -> "";
+            default -> "";
+        };
     }
 
     private int getIntCell(Row row, int index, int rowNum, String field) {
@@ -119,8 +132,7 @@ public class DrugService {
 
     private String getStringCell(Row row, int index, int rowNum, String field) {
         try {
-            Cell cell = row.getCell(index);
-            return getCellAsString(cell);
+            return getCellAsString(row.getCell(index));
         } catch (Exception e) {
             throw new RuntimeException("Ошибка в поле [" + field + "] (строка " + rowNum + "): " + e.getMessage());
         }
@@ -134,33 +146,6 @@ public class DrugService {
             throw new RuntimeException("Ошибка в поле [" + field + "] (строка " + rowNum + "): " + e.getMessage());
         }
     }
-
-    private String getCellAsString(Cell cell) {
-        if (cell == null) return null;
-
-        switch (cell.getCellType()) {
-            case STRING:
-                return cell.getStringCellValue().trim();
-            case NUMERIC:
-                if (DateUtil.isCellDateFormatted(cell)) {
-                    return cell.getDateCellValue().toString();
-                } else {
-                    double val = cell.getNumericCellValue();
-                    return (val == Math.floor(val)) ? String.valueOf((long) val) : String.valueOf(val);
-                }
-            case BOOLEAN:
-                return String.valueOf(cell.getBooleanCellValue());
-            case FORMULA:
-                return cell.getCellFormula(); // или cell.getStringCellValue() для значения
-            case BLANK:
-                return "";
-            default:
-                return "";
-        }
-    }
-
-    public List<Drug> getAll() {
-        return drugRepository.findAll();
-    }
 }
+
 
