@@ -14,7 +14,7 @@ import java.nio.file.Paths;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "https://skffront.netlify.app")
+@CrossOrigin(origins = "*")
 public class AuthenticationController {
 
     private final AuthenticationService service;
