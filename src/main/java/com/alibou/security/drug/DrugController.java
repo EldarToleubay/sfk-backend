@@ -6,6 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
@@ -16,14 +19,12 @@ public class DrugController {
     private final DrugService drugService;
     private final DrugRepository drugRepository;
     private final ReferenceService referenceService;
-    private final ImportProgressTracker progressTracker;
 
 
-    public DrugController(DrugService drugService, DrugRepository drugRepository, ReferenceService referenceService, ImportProgressTracker progressTracker) {
+    public DrugController(DrugService drugService, DrugRepository drugRepository, ReferenceService referenceService) {
         this.drugService = drugService;
         this.drugRepository = drugRepository;
         this.referenceService = referenceService;
-        this.progressTracker = progressTracker;
     }
 //
 //    @GetMapping
@@ -39,10 +40,14 @@ public class DrugController {
 
 
     @PostMapping("/upload-async")
-    public ResponseEntity<String> uploadFileAsync(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> uploadFileAsync(@RequestParam("file") MultipartFile file) throws IOException {
+
+        byte[] fileBytes = file.getBytes(); // читаем в память
+
         CompletableFuture.runAsync(() -> {
-            try {
-                drugService.importExcel(file);
+            try (InputStream inputStream = new ByteArrayInputStream(fileBytes)) {
+                drugService.removeAllDrugs();
+                drugService.importExcel(inputStream); // передаём стрим
                 referenceService.setAll();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -52,38 +57,19 @@ public class DrugController {
         return ResponseEntity.accepted().body("Файл принят. Импорт выполняется в фоне.");
     }
 
-
-
-    @PostMapping("/upload")
-    @Operation(summary = "Загрузка Excel-файла", description = "Загружает Excel-файл и сохраняет данные")
-    public ResponseEntity<String> uploadFile(
-            @Parameter(description = "Excel файл", required = true)
-            @RequestParam("file") MultipartFile file) {
-        try {
-            drugService.importExcel(file);
-            referenceService.setAll();
-            return ResponseEntity.ok("Файл успешно обработан и данные сохранены");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Ошибка при обработке файла: " + e.getMessage());
-        }
-    }
-
-    @PostMapping("/async-upolad2")
-    public ResponseEntity<String> importExcel(@RequestParam("file") MultipartFile file) {
-        drugService.importExcelAsync(file); // Асинхронно
-        return ResponseEntity.accepted().body("Импорт запущен.");
-    }
-
-    @GetMapping("/progress")
-    public ResponseEntity<ImportProgressResponse> getProgress() {
-        return ResponseEntity.ok(new ImportProgressResponse(
-                progressTracker.getProgress(),
-                progressTracker.isCompleted()
-        ));
-    }
-
-    record ImportProgressResponse(int progress, boolean completed) {}
-
+//    @PostMapping("/upload")
+//    @Operation(summary = "Загрузка Excel-файла", description = "Загружает Excel-файл и сохраняет данные")
+//    public ResponseEntity<String> uploadFile(
+//            @Parameter(description = "Excel файл", required = true)
+//            @RequestParam("file") MultipartFile file) {
+//        try {
+//            drugService.importExcel(file);
+//            referenceService.setAll();
+//            return ResponseEntity.ok("Файл успешно обработан и данные сохранены");
+//        } catch (Exception e) {
+//            return ResponseEntity.badRequest().body("Ошибка при обработке файла: " + e.getMessage());
+//        }
+//    }
 
 }
 

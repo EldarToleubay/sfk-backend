@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -22,14 +23,39 @@ import java.util.List;
 public class DrugService {
 
     private final DrugRepository drugRepository;
-    private final ImportProgressTracker progressTracker;
 
+
+    public String removeAllDrugs() {
+        drugRepository.deleteAll();
+        return "Drugs removed";
+    }
+
+
+    private String getCellAsString(Cell cell) {
+        if (cell == null) return null;
+
+        return switch (cell.getCellType()) {
+            case STRING -> cell.getStringCellValue().trim();
+            case NUMERIC -> {
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    yield cell.getDateCellValue().toString();
+                }
+                double val = cell.getNumericCellValue();
+                yield (val == Math.floor(val)) ? String.valueOf((long) val) : String.valueOf(val);
+            }
+            case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
+            case FORMULA -> cell.getCellFormula();
+            case BLANK -> "";
+            default -> "";
+        };
+    }
 
     private static final int BATCH_SIZE = 1000;
 
-    public void importExcel(MultipartFile file) throws Exception {
-        try (InputStream is = file.getInputStream();
-             Workbook workbook = new XSSFWorkbook(is)) {
+    //    public void importExcel(MultipartFile file) throws Exception {
+    public void importExcel(InputStream inputStream) throws Exception {
+
+        try (Workbook workbook = new XSSFWorkbook(inputStream)) {
 
             Sheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rows = sheet.iterator();
@@ -103,88 +129,6 @@ public class DrugService {
             System.out.println("Импорт завершён. Ошибок: " + errors.size());
             errors.forEach(System.out::println);
         }
-    }
-
-    @Async
-    public void importExcelAsync(MultipartFile file) {
-        try {
-            progressTracker.reset();
-
-            try (InputStream is = file.getInputStream();
-                 Workbook workbook = new XSSFWorkbook(is)) {
-
-                Sheet sheet = workbook.getSheetAt(0);
-                Iterator<Row> rows = sheet.iterator();
-
-                if (rows.hasNext()) rows.next();
-
-                int totalRows = sheet.getPhysicalNumberOfRows() - 1;
-                int rowNum = 1;
-                int processed = 0;
-
-                drugRepository.deleteAll();
-
-                List<Drug> batch = new ArrayList<>();
-                List<String> errors = new ArrayList<>();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-
-                while (rows.hasNext()) {
-                    Row row = rows.next();
-                    rowNum++;
-
-                    try {
-                        Drug drug = new Drug();
-                        // заполняем объект как раньше...
-                        drug.setYear(getIntCell(row, 0, rowNum, "year"));
-                        // и так далее
-
-                        batch.add(drug);
-                        if (batch.size() == BATCH_SIZE) {
-                            drugRepository.saveAll(batch);
-                            batch.clear();
-                        }
-
-                    } catch (Exception e) {
-                        errors.add("Ошибка в строке " + rowNum + ": " + e.getMessage());
-                    }
-
-                    processed++;
-                    int percent = (processed * 100) / totalRows;
-                    progressTracker.update(percent);
-                }
-
-                if (!batch.isEmpty()) {
-                    drugRepository.saveAll(batch);
-                }
-
-                progressTracker.complete();
-                System.out.println("Импорт завершён. Ошибок: " + errors.size());
-                errors.forEach(System.out::println);
-            }
-
-        } catch (Exception e) {
-            progressTracker.update(0);
-            System.err.println("Ошибка импорта: " + e.getMessage());
-        }
-    }
-
-    private String getCellAsString(Cell cell) {
-        if (cell == null) return null;
-
-        return switch (cell.getCellType()) {
-            case STRING -> cell.getStringCellValue().trim();
-            case NUMERIC -> {
-                if (DateUtil.isCellDateFormatted(cell)) {
-                    yield cell.getDateCellValue().toString();
-                }
-                double val = cell.getNumericCellValue();
-                yield (val == Math.floor(val)) ? String.valueOf((long) val) : String.valueOf(val);
-            }
-            case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
-            case FORMULA -> cell.getCellFormula();
-            case BLANK -> "";
-            default -> "";
-        };
     }
 
     private int getIntCell(Row row, int index, int rowNum, String field) {
