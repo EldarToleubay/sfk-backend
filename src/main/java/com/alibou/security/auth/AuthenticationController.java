@@ -41,8 +41,6 @@ public class AuthenticationController {
         service.refreshToken(request, response);
     }
 
-
-
     @GetMapping("/logs")
     public ResponseEntity<String> getLogs() throws IOException {
         Path logFile = Paths.get(System.getProperty("logging.file.name"));
