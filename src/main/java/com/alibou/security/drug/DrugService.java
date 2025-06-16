@@ -26,7 +26,7 @@ public class DrugService {
 
 
     public String removeAllDrugs() {
-        drugRepository.deleteAll();
+        drugRepository.deleteAllFast();
         return "Drugs removed";
     }
 

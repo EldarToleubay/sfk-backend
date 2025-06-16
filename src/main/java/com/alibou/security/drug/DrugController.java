@@ -35,7 +35,7 @@ public class DrugController {
 
     @GetMapping("/remove")
     public String removeAllDrugs() {
-        drugRepository.deleteAll();
+        drugRepository.deleteAllFast();
         return "Drugs removed";
     }
 
