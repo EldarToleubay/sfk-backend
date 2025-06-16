@@ -3,11 +3,15 @@ spring:
     url: jdbc:postgresql://crossover.proxy.rlwy.net:51973/railway
     username: postgres
     password: kbUpnqjAtOvJgitGTUeijUrSwCPrPZhC
-#spring:
-#  datasource:
-#    url: jdbc:postgresql://localhost:5432/sf_adminpanel
-#    username: sf_admin
-#    password: admin
+
+
+
+
+    #spring:
+    #  datasource:
+    #    url: jdbc:postgresql://localhost:5432/sf_adminpanel
+    #    username: sf_admin
+    #    password: admin
     driver-class-name: org.postgresql.Driver
     hikari:
       auto-commit: false
@@ -18,8 +22,25 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        jdbc.batch_size: 1000
+        order_updates: true
+        order_inserts: true
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+    generate-ddl: true
+
+  #    spring:
+  #      jpa:
+  #        properties:
+  #          hibernate.jdbc.batch_size: 1000
+  #          hibernate.order_inserts: true
+  #          hibernate.order_updates: true
+  #        show-sql: false
+  #        generate-ddl: true
+  #        hibernate:
+  #          ddl-auto: update
+
+
   servlet:
     multipart:
       max-file-size: 100MB
