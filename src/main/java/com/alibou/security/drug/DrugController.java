@@ -2,6 +2,7 @@ package com.alibou.security.drug;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,7 +34,8 @@ public class DrugController {
 //    }
 
 
-    @GetMapping("/remove")
+    @DeleteMapping("/remove")
+    @Transactional
     public String removeAllDrugs() {
         drugRepository.deleteAllFast();
         return "Drugs removed";
@@ -47,6 +49,7 @@ public class DrugController {
 
 
     @PostMapping("/upload-async")
+    @Transactional
     public ResponseEntity<String> uploadFileAsync(@RequestParam("file") MultipartFile file) throws IOException {
 
         byte[] fileBytes = file.getBytes(); // читаем в память
