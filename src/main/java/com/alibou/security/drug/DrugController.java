@@ -67,7 +67,7 @@ public class DrugController {
         }
     }
 
-    @PostMapping
+    @PostMapping("/async-upolad2")
     public ResponseEntity<String> importExcel(@RequestParam("file") MultipartFile file) {
         drugService.importExcelAsync(file); // Асинхронно
         return ResponseEntity.accepted().body("Импорт запущен.");
