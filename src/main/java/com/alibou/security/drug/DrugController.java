@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
@@ -15,10 +14,12 @@ import java.util.concurrent.CompletableFuture;
 public class DrugController {
 
     private final DrugService drugService;
+    private final DrugRepository drugRepository;
     private final ReferenceService referenceService;
 
-    public DrugController(DrugService drugService, ReferenceService referenceService) {
+    public DrugController(DrugService drugService, DrugRepository drugRepository, ReferenceService referenceService) {
         this.drugService = drugService;
+        this.drugRepository = drugRepository;
         this.referenceService = referenceService;
     }
 //
@@ -27,6 +28,11 @@ public class DrugController {
 //        return drugService.getAll();
 //    }
 
+
+    @GetMapping("/count")
+    public long count() {
+        return drugRepository.count();
+    }
 
 
     @PostMapping("/upload-async")
