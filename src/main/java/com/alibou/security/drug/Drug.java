@@ -14,8 +14,10 @@ import java.time.LocalDate;
 public class Drug {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "drug_seq")
+    @SequenceGenerator(name = "drug_seq", sequenceName = "drug_seq", allocationSize = 1000)
     private Long id;
+
 
     //1 Год регистрации
     @Column(name = "year")
