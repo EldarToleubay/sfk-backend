@@ -33,6 +33,13 @@ public class DrugController {
 //    }
 
 
+    @GetMapping("/remove")
+    public String removeAllDrugs() {
+        drugRepository.deleteAll();
+        return "Drugs removed";
+    }
+
+
     @GetMapping("/count")
     public long count() {
         return drugRepository.count();
