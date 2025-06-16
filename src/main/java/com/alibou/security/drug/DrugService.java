@@ -1,20 +1,16 @@
 package com.alibou.security.drug;
 
-import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -25,9 +21,9 @@ public class DrugService {
     private final DrugRepository drugRepository;
 
 
-    public String removeAllDrugs() {
+    @Transactional
+    public void removeAllDrugs() {
         drugRepository.deleteAllFast();
-        return "Drugs removed";
     }
 
 
