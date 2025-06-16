@@ -16,11 +16,14 @@ public class DrugController {
     private final DrugService drugService;
     private final DrugRepository drugRepository;
     private final ReferenceService referenceService;
+    private final ImportProgressTracker progressTracker;
 
-    public DrugController(DrugService drugService, DrugRepository drugRepository, ReferenceService referenceService) {
+
+    public DrugController(DrugService drugService, DrugRepository drugRepository, ReferenceService referenceService, ImportProgressTracker progressTracker) {
         this.drugService = drugService;
         this.drugRepository = drugRepository;
         this.referenceService = referenceService;
+        this.progressTracker = progressTracker;
     }
 //
 //    @GetMapping
@@ -40,6 +43,7 @@ public class DrugController {
         CompletableFuture.runAsync(() -> {
             try {
                 drugService.importExcel(file);
+                referenceService.setAll();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -62,6 +66,22 @@ public class DrugController {
             return ResponseEntity.badRequest().body("Ошибка при обработке файла: " + e.getMessage());
         }
     }
+
+    @PostMapping
+    public ResponseEntity<String> importExcel(@RequestParam("file") MultipartFile file) {
+        drugService.importExcelAsync(file); // Асинхронно
+        return ResponseEntity.accepted().body("Импорт запущен.");
+    }
+
+    @GetMapping("/progress")
+    public ResponseEntity<ImportProgressResponse> getProgress() {
+        return ResponseEntity.ok(new ImportProgressResponse(
+                progressTracker.getProgress(),
+                progressTracker.isCompleted()
+        ));
+    }
+
+    record ImportProgressResponse(int progress, boolean completed) {}
 
 
 }

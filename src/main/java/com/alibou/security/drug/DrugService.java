@@ -5,6 +5,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,6 +22,8 @@ import java.util.List;
 public class DrugService {
 
     private final DrugRepository drugRepository;
+    private final ImportProgressTracker progressTracker;
+
 
     private static final int BATCH_SIZE = 1000;
 
@@ -99,6 +102,69 @@ public class DrugService {
 
             System.out.println("Импорт завершён. Ошибок: " + errors.size());
             errors.forEach(System.out::println);
+        }
+    }
+
+    @Async
+    public void importExcelAsync(MultipartFile file) {
+        try {
+            progressTracker.reset();
+
+            try (InputStream is = file.getInputStream();
+                 Workbook workbook = new XSSFWorkbook(is)) {
+
+                Sheet sheet = workbook.getSheetAt(0);
+                Iterator<Row> rows = sheet.iterator();
+
+                if (rows.hasNext()) rows.next();
+
+                int totalRows = sheet.getPhysicalNumberOfRows() - 1;
+                int rowNum = 1;
+                int processed = 0;
+
+                drugRepository.deleteAll();
+
+                List<Drug> batch = new ArrayList<>();
+                List<String> errors = new ArrayList<>();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+
+                while (rows.hasNext()) {
+                    Row row = rows.next();
+                    rowNum++;
+
+                    try {
+                        Drug drug = new Drug();
+                        // заполняем объект как раньше...
+                        drug.setYear(getIntCell(row, 0, rowNum, "year"));
+                        // и так далее
+
+                        batch.add(drug);
+                        if (batch.size() == BATCH_SIZE) {
+                            drugRepository.saveAll(batch);
+                            batch.clear();
+                        }
+
+                    } catch (Exception e) {
+                        errors.add("Ошибка в строке " + rowNum + ": " + e.getMessage());
+                    }
+
+                    processed++;
+                    int percent = (processed * 100) / totalRows;
+                    progressTracker.update(percent);
+                }
+
+                if (!batch.isEmpty()) {
+                    drugRepository.saveAll(batch);
+                }
+
+                progressTracker.complete();
+                System.out.println("Импорт завершён. Ошибок: " + errors.size());
+                errors.forEach(System.out::println);
+            }
+
+        } catch (Exception e) {
+            progressTracker.update(0);
+            System.err.println("Ошибка импорта: " + e.getMessage());
         }
     }
 
