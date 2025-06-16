@@ -27,12 +27,6 @@ public class DrugController {
         this.drugRepository = drugRepository;
         this.referenceService = referenceService;
     }
-//
-//    @GetMapping
-//    public List<Drug> getAllDrugs() {
-//        return drugService.getAll();
-//    }
-
 
     @DeleteMapping("/remove")
     @Transactional
@@ -67,19 +61,7 @@ public class DrugController {
         return ResponseEntity.accepted().body("Файл принят. Импорт выполняется в фоне.");
     }
 
-//    @PostMapping("/upload")
-//    @Operation(summary = "Загрузка Excel-файла", description = "Загружает Excel-файл и сохраняет данные")
-//    public ResponseEntity<String> uploadFile(
-//            @Parameter(description = "Excel файл", required = true)
-//            @RequestParam("file") MultipartFile file) {
-//        try {
-//            drugService.importExcel(file);
-//            referenceService.setAll();
-//            return ResponseEntity.ok("Файл успешно обработан и данные сохранены");
-//        } catch (Exception e) {
-//            return ResponseEntity.badRequest().body("Ошибка при обработке файла: " + e.getMessage());
-//        }
-//    }
+
 
 }
 
