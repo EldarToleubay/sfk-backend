@@ -178,7 +178,41 @@ public class ReferenceService {
     }
 
 
-    public List<Inn> getAll() {
+    public List<Inn> getAllInn() {
         return innRepository.findAll();
+    }
+
+    public List<Atc1> getAllAtc1() {
+        return atc1Repository.findAll();
+    }
+
+    public List<Atc2> getAllAtc2() {
+        return atc2Repository.findAll();
+    }
+
+    public List<Atc3> getAllAtc3() {return atc3Repository.findAll();}
+
+    public List<Dosage> getAllDosage() {
+        return dosageRepository.findAll();
+    }
+
+    public List<DrugForm> getAllDrugForm() {
+        return drugFormRepository.findAll();
+    }
+
+    public List<ManufacturingCompany> getAllManufacturingCompany() {
+        return manufacturingCompanyRepository.findAll();
+    }
+
+    public List<PackQuantity> getAllPackQuantity() {
+        return packQuantityRepository.findAll();
+    }
+
+    public List<Segment> getAllSegment() {
+        return segmentRepository.findAll();
+    }
+
+    public List<TradeName> getAllTradeName() {
+        return tradeNameRepository.findAll();
     }
 }
