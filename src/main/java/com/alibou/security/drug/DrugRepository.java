@@ -1,12 +1,13 @@
 package com.alibou.security.drug;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface DrugRepository extends JpaRepository<Drug, Long> {
+public interface DrugRepository extends JpaRepository<Drug, Long>, JpaSpecificationExecutor<Drug> {
 
     @Query("SELECT DISTINCT d.inn FROM Drug d WHERE d.inn IS NOT NULL ORDER BY d.inn")
     List<String> findDistinctInn();

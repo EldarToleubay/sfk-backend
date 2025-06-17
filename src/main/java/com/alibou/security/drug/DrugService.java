@@ -5,6 +5,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
@@ -154,6 +158,62 @@ public class DrugService {
         } catch (Exception e) {
             throw new RuntimeException("Ошибка в поле [" + field + "] (строка " + rowNum + "): " + e.getMessage());
         }
+    }
+
+    public Page<Drug> fetchAll(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return drugRepository.findAll(pageRequest);
+    }
+
+    public Page<Drug> fetchAllWithFilters(
+            String inn,
+            String segment,
+            String tradeName,
+            String manufacturingCompany,
+            String drugForm,
+            String dosage,
+            String packQuantity,
+            String atc1,
+            String atc2,
+            String atc3,
+            int page,
+            int size
+    ) {
+        Specification<Drug> spec = Specification.where(null);
+
+        if (inn != null && !inn.isBlank()) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("inn"), inn));
+        }
+        if (segment != null && !segment.isBlank()) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("segment"), segment));
+        }
+        if (tradeName != null && !tradeName.isBlank()) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("tradeName"), tradeName));
+        }
+        if (manufacturingCompany != null && !manufacturingCompany.isBlank()) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("manufacturingCompany"), manufacturingCompany));
+        }
+        if (drugForm != null && !drugForm.isBlank()) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("drugForm"), drugForm));
+        }
+        if (dosage != null && !dosage.isBlank()) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("dosage"), dosage));
+        }
+        if (packQuantity != null && !packQuantity.isBlank()) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("packQuantity"), packQuantity));
+        }
+        if (atc1 != null && !atc1.isBlank()) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("atc1"), atc1));
+        }
+        if (atc2 != null && !atc2.isBlank()) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("atc2"), atc2));
+        }
+        if (atc3 != null && !atc3.isBlank()) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("atc3"), atc3));
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+        return drugRepository.findAll(spec, pageable);
     }
 }
 
