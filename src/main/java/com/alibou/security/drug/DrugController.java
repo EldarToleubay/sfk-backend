@@ -18,12 +18,14 @@ import java.util.concurrent.CompletableFuture;
 public class DrugController {
 
     private final DrugService drugService;
+    private final ImportService importService;
     private final DrugRepository drugRepository;
     private final ReferenceService referenceService;
 
 
-    public DrugController(DrugService drugService, DrugRepository drugRepository, ReferenceService referenceService) {
+    public DrugController(DrugService drugService, ImportService importService, DrugRepository drugRepository, ReferenceService referenceService) {
         this.drugService = drugService;
+        this.importService = importService;
         this.drugRepository = drugRepository;
         this.referenceService = referenceService;
     }
@@ -43,24 +45,20 @@ public class DrugController {
 
 
     @PostMapping("/upload-async")
-    @Transactional
     public ResponseEntity<String> uploadFileAsync(@RequestParam("file") MultipartFile file) throws IOException {
 
         byte[] fileBytes = file.getBytes(); // читаем в память
 
         CompletableFuture.runAsync(() -> {
             try (InputStream inputStream = new ByteArrayInputStream(fileBytes)) {
-                drugService.removeAllDrugs();
-                drugService.importExcel(inputStream); // передаём стрим
-                referenceService.setAll();
+                importService.importDrugsAsync(inputStream);
             } catch (Exception e) {
-                e.printStackTrace();
+                e.printStackTrace(); // или логгировать
             }
         });
 
         return ResponseEntity.accepted().body("Файл принят. Импорт выполняется в фоне.");
     }
-
 
 
 }
