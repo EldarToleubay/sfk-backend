@@ -2,6 +2,7 @@ package com.alibou.security.drug;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DrugService {
 
     private final DrugRepository drugRepository;
@@ -24,6 +26,7 @@ public class DrugService {
     @Transactional
     public void removeAllDrugs() {
         drugRepository.deleteAllFast();
+        log.info("Drugs removed");
     }
 
 
