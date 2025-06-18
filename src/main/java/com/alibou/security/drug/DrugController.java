@@ -43,12 +43,7 @@ public class DrugController {
 
     @PostMapping("/filter")
     public Page<Drug> getFilteredDrugs(@RequestBody DrugFilterRequest request) {
-        return drugService.fetchAllWithFilters(
-                request.getInn(), request.getSegment(), request.getTradeName(),
-                request.getManufacturingCompany(), request.getDrugForm(), request.getDosage(),
-                request.getPackQuantity(), request.getAtc1(), request.getAtc2(), request.getAtc3(),
-                request.getPage(), request.getSize()
-        );
+        return drugService.fetchAllWithFilters(request);
     }
 
 

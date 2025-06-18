@@ -2,6 +2,7 @@ package com.alibou.security.drug;
 
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -17,6 +18,10 @@ public class DrugFilterRequest {
     private List<String> atc1;
     private List<String> atc2;
     private List<String> atc3;
+
+    private LocalDate dateFrom;
+    private LocalDate dateTo;
+
     private int page = 0;
     private int size = 10;
 }

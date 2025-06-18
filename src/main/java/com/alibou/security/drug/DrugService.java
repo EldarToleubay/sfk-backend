@@ -165,36 +165,33 @@ public class DrugService {
         return drugRepository.findAll(pageRequest);
     }
 
-    public Page<Drug> fetchAllWithFilters(
-            List<String> inn,
-            List<String> segment,
-            List<String> tradeName,
-            List<String> manufacturingCompany,
-            List<String> drugForm,
-            List<String> dosage,
-            List<String> packQuantity,
-            List<String> atc1,
-            List<String> atc2,
-            List<String> atc3,
-            int page,
-            int size
-    ) {
+    public Page<Drug> fetchAllWithFilters(DrugFilterRequest request) {
         Specification<Drug> spec = Specification.where(null);
 
-        spec = addListFilter(spec, inn, "inn");
-        spec = addListFilter(spec, segment, "segment");
-        spec = addListFilter(spec, tradeName, "tradeName");
-        spec = addListFilter(spec, manufacturingCompany, "manufacturingCompany");
-        spec = addListFilter(spec, drugForm, "drugForm");
-        spec = addListFilter(spec, dosage, "dosage");
-        spec = addListFilter(spec, packQuantity, "packQuantity");
-        spec = addListFilter(spec, atc1, "atc1");
-        spec = addListFilter(spec, atc2, "atc2");
-        spec = addListFilter(spec, atc3, "atc3");
+        spec = addListFilter(spec, request.getInn(), "inn");
+        spec = addListFilter(spec, request.getSegment(), "segment");
+        spec = addListFilter(spec, request.getTradeName(), "tradeName");
+        spec = addListFilter(spec, request.getManufacturingCompany(), "manufacturingCompany");
+        spec = addListFilter(spec, request.getDrugForm(), "drugForm");
+        spec = addListFilter(spec, request.getDosage(), "dosage");
+        spec = addListFilter(spec, request.getPackQuantity(), "packQuantity");
+        spec = addListFilter(spec, request.getAtc1(), "atc1");
+        spec = addListFilter(spec, request.getAtc2(), "atc2");
+        spec = addListFilter(spec, request.getAtc3(), "atc3");
 
-        Pageable pageable = PageRequest.of(Math.max(0, page), Math.max(1, size));
+        if (request.getDateFrom() != null) {
+            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("importDate"), request.getDateFrom()));
+        }
+
+        if (request.getDateTo() != null) {
+            spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("importDate"), request.getDateTo()));
+        }
+
+        Pageable pageable = PageRequest.of(Math.max(0, request.getPage()), Math.max(1, request.getSize()));
         return drugRepository.findAll(spec, pageable);
     }
+
+
 
     private Specification<Drug> addListFilter(Specification<Drug> spec, List<String> values, String field) {
         if (values != null && !values.isEmpty()) {
