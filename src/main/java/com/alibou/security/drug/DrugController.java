@@ -42,11 +42,9 @@ public class DrugController {
 
 
     @PostMapping("/filter")
-    public Page<Drug> getFilteredDrugs(@RequestBody DrugFilterRequest request) {
+    public List<Drug> getFilteredDrugs(@RequestBody DrugFilterRequest request) {
         return drugService.fetchAllWithFilters(request);
     }
-
-
 
 
     @GetMapping("/count")

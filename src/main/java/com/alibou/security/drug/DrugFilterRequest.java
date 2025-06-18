@@ -21,7 +21,4 @@ public class DrugFilterRequest {
 
     private LocalDate dateFrom;
     private LocalDate dateTo;
-
-    private int page = 0;
-    private int size = 10;
 }

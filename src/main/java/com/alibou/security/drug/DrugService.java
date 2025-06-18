@@ -165,7 +165,7 @@ public class DrugService {
         return drugRepository.findAll(pageRequest);
     }
 
-    public Page<Drug> fetchAllWithFilters(DrugFilterRequest request) {
+    public List<Drug> fetchAllWithFilters(DrugFilterRequest request) {
         Specification<Drug> spec = Specification.where(null);
 
         spec = addListFilter(spec, request.getInn(), "inn");
@@ -187,8 +187,7 @@ public class DrugService {
             spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("importDate"), request.getDateTo()));
         }
 
-        Pageable pageable = PageRequest.of(Math.max(0, request.getPage()), Math.max(1, request.getSize()));
-        return drugRepository.findAll(spec, pageable);
+        return drugRepository.findAll(spec);
     }
 
 
