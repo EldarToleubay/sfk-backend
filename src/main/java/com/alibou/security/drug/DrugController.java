@@ -41,27 +41,16 @@ public class DrugController {
     }
 
 
-    @GetMapping
-    public Page<Drug> getAllDrugs(
-            @RequestParam(required = false) String inn,
-            @RequestParam(required = false) String segment,
-            @RequestParam(required = false) String tradeName,
-            @RequestParam(required = false) String manufacturingCompany,
-            @RequestParam(required = false) String drugForm,
-            @RequestParam(required = false) String dosage,
-            @RequestParam(required = false) String packQuantity,
-            @RequestParam(required = false) String atc1,
-            @RequestParam(required = false) String atc2,
-            @RequestParam(required = false) String atc3,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
+    @PostMapping("/filter")
+    public Page<Drug> getFilteredDrugs(@RequestBody DrugFilterRequest request) {
         return drugService.fetchAllWithFilters(
-                inn, segment, tradeName, manufacturingCompany,
-                drugForm, dosage, packQuantity, atc1, atc2, atc3,
-                page, size
+                request.getInn(), request.getSegment(), request.getTradeName(),
+                request.getManufacturingCompany(), request.getDrugForm(), request.getDosage(),
+                request.getPackQuantity(), request.getAtc1(), request.getAtc2(), request.getAtc3(),
+                request.getPage(), request.getSize()
         );
     }
+
 
 
 

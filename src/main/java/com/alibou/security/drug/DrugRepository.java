@@ -44,4 +44,6 @@ public interface DrugRepository extends JpaRepository<Drug, Long>, JpaSpecificat
     void deleteAllFast();
 
 
+
+    List<Drug> findBySegment(String segment);
 }

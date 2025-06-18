@@ -166,55 +166,43 @@ public class DrugService {
     }
 
     public Page<Drug> fetchAllWithFilters(
-            String inn,
-            String segment,
-            String tradeName,
-            String manufacturingCompany,
-            String drugForm,
-            String dosage,
-            String packQuantity,
-            String atc1,
-            String atc2,
-            String atc3,
+            List<String> inn,
+            List<String> segment,
+            List<String> tradeName,
+            List<String> manufacturingCompany,
+            List<String> drugForm,
+            List<String> dosage,
+            List<String> packQuantity,
+            List<String> atc1,
+            List<String> atc2,
+            List<String> atc3,
             int page,
             int size
     ) {
         Specification<Drug> spec = Specification.where(null);
 
-        if (inn != null && !inn.isBlank()) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("inn"), inn));
-        }
-        if (segment != null && !segment.isBlank()) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("segment"), segment));
-        }
-        if (tradeName != null && !tradeName.isBlank()) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("tradeName"), tradeName));
-        }
-        if (manufacturingCompany != null && !manufacturingCompany.isBlank()) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("manufacturingCompany"), manufacturingCompany));
-        }
-        if (drugForm != null && !drugForm.isBlank()) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("drugForm"), drugForm));
-        }
-        if (dosage != null && !dosage.isBlank()) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("dosage"), dosage));
-        }
-        if (packQuantity != null && !packQuantity.isBlank()) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("packQuantity"), packQuantity));
-        }
-        if (atc1 != null && !atc1.isBlank()) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("atc1"), atc1));
-        }
-        if (atc2 != null && !atc2.isBlank()) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("atc2"), atc2));
-        }
-        if (atc3 != null && !atc3.isBlank()) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("atc3"), atc3));
-        }
+        spec = addListFilter(spec, inn, "inn");
+        spec = addListFilter(spec, segment, "segment");
+        spec = addListFilter(spec, tradeName, "tradeName");
+        spec = addListFilter(spec, manufacturingCompany, "manufacturingCompany");
+        spec = addListFilter(spec, drugForm, "drugForm");
+        spec = addListFilter(spec, dosage, "dosage");
+        spec = addListFilter(spec, packQuantity, "packQuantity");
+        spec = addListFilter(spec, atc1, "atc1");
+        spec = addListFilter(spec, atc2, "atc2");
+        spec = addListFilter(spec, atc3, "atc3");
 
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(Math.max(0, page), Math.max(1, size));
         return drugRepository.findAll(spec, pageable);
     }
+
+    private Specification<Drug> addListFilter(Specification<Drug> spec, List<String> values, String field) {
+        if (values != null && !values.isEmpty()) {
+            return spec.and((root, query, cb) -> root.get(field).in(values));
+        }
+        return spec;
+    }
+
 }
 
 
