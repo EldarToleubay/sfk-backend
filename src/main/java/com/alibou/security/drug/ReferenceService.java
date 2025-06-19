@@ -190,7 +190,9 @@ public class ReferenceService {
         return atc2Repository.findAll();
     }
 
-    public List<Atc3> getAllAtc3() {return atc3Repository.findAll();}
+    public List<Atc3> getAllAtc3() {
+        return atc3Repository.findAll();
+    }
 
     public List<Dosage> getAllDosage() {
         return dosageRepository.findAll();

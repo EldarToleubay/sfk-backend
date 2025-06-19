@@ -10,4 +10,7 @@ public interface DosageRepository extends JpaRepository<Dosage, Long> {
     @Query("SELECT i.name FROM Dosage i")
     List<String> findAllNames();
 
+    List<Dosage> findByIdIn(List<Long> ids);
+
+
 }

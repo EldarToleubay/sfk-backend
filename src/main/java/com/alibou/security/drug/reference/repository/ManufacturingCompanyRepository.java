@@ -10,4 +10,7 @@ public interface ManufacturingCompanyRepository extends JpaRepository<Manufactur
     @Query("SELECT i.name FROM ManufacturingCompany i")
     List<String> findAllNames();
 
+    List<ManufacturingCompany> findByIdIn(List<Long> ids);
+
+
 }

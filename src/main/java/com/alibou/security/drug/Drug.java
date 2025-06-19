@@ -107,6 +107,9 @@ public class Drug {
     @Column(name = "value_in_usd")
     private BigDecimal valueInUsd;
 
+    @Column(name = "volume_in_su")
+    private BigDecimal volumeInSU;
+
     //23 Дата регистрации
     @Column(name = "import_date")
     private LocalDate importDate;

@@ -10,4 +10,6 @@ public interface SegmentRepository extends JpaRepository<Segment, Long> {
     @Query("SELECT i.name FROM Segment i")
     List<String> findAllNames();
 
+    List<Segment> findByIdIn(List<Long> ids);
+
 }

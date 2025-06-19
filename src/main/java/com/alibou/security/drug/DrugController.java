@@ -1,9 +1,6 @@
 package com.alibou.security.drug;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.transaction.Transactional;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,6 +47,20 @@ public class DrugController {
     @GetMapping("/count")
     public long count() {
         return drugRepository.count();
+    }
+
+//    @GetMapping("/top-companies")
+//    public List<NameValueDto> getTopCompanies(
+//            @RequestParam(defaultValue = "usd") String currency
+//    ) {
+//        return drugService.getTopCompanies(currency);
+//    }
+
+    @PostMapping("/top-companies")
+    public List<NameValueDto> getTopCompanies(@RequestBody DrugFilterRequest request,
+                                              @RequestParam(defaultValue = "usd") String currency
+    ) {
+        return drugService.getTopCompaniesFiltered(request, currency);
     }
 
 

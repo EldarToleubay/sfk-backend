@@ -10,4 +10,7 @@ public interface Atc3Repository extends JpaRepository<Atc3, Long> {
     @Query("SELECT i.name FROM Atc3 i")
     List<String> findAllNames();
 
+    List<Atc3> findByIdIn(List<Long> ids);
+
+
 }

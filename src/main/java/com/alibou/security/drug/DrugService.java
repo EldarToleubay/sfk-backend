@@ -53,6 +53,7 @@ public class DrugService {
         };
     }
 
+
     private static final int BATCH_SIZE = 1000;
 
     //    public void importExcel(MultipartFile file) throws Exception {
@@ -100,8 +101,9 @@ public class DrugService {
                     drug.setPricePerUnitUsd(getBigDecimalCell(row, 19, rowNum, "pricePerUnitUsd"));
                     drug.setValueInGel(getBigDecimalCell(row, 20, rowNum, "valueInGel"));
                     drug.setValueInUsd(getBigDecimalCell(row, 21, rowNum, "valueInUsd"));
+                    drug.setVolumeInSU(getBigDecimalCell(row, 22, rowNum, "volumeInSU"));
 
-                    Cell dateCell = row.getCell(22);
+                    Cell dateCell = row.getCell(23);
                     if (dateCell != null) {
                         if (dateCell.getCellType() == CellType.NUMERIC) {
                             drug.setImportDate(dateCell.getLocalDateTimeCellValue().toLocalDate());
@@ -110,7 +112,7 @@ public class DrugService {
                         }
                     }
 
-                    drug.setPriceSource(getStringCell(row, 23, rowNum, "priceSource"));
+                    drug.setPriceSource(getStringCell(row, 24, rowNum, "priceSource"));
 
                     batch.add(drug);
 
@@ -191,13 +193,25 @@ public class DrugService {
     }
 
 
-
     private Specification<Drug> addListFilter(Specification<Drug> spec, List<String> values, String field) {
         if (values != null && !values.isEmpty()) {
             return spec.and((root, query, cb) -> root.get(field).in(values));
         }
         return spec;
     }
+
+
+    public List<NameValueDto> getTopCompaniesFiltered(DrugFilterRequest filter, String currency) {
+        Pageable topFive = PageRequest.of(0, 5);
+        return drugRepository.findTopCompaniesWithFilters(filter, currency, topFive);
+    }
+
+
+//
+//    public List<NameValueDto> getTopCompaniesFiltered(DrugFilterRequest request, String currency) {
+//        return drugRepository.findTopCompaniesWithFilters(request, currency.toLowerCase(), 5);
+//    }
+
 
 }
 

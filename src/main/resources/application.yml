@@ -1,11 +1,15 @@
+#spring:
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/postgres
+#    username: postgres
+#    password: postgres
+
+
 spring:
   datasource:
     url: jdbc:postgresql://crossover.proxy.rlwy.net:51973/railway
     username: postgres
     password: kbUpnqjAtOvJgitGTUeijUrSwCPrPZhC
-
-
-
 
     #spring:
     #  datasource:
@@ -17,7 +21,7 @@ spring:
       auto-commit: false
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     show-sql: false
     properties:
       hibernate:

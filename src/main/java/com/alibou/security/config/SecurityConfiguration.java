@@ -40,6 +40,7 @@ public class SecurityConfiguration {
             "/v2/api-docs",
             "/api/drugs/**",
             "/api/reference/**",
+            "/api/access/**",
             "/v2/api-docs",
             "/v3/api-docs",
             "/v3/api-docs/**",

@@ -10,4 +10,7 @@ public interface DrugFormRepository extends JpaRepository<DrugForm, Long> {
     @Query("SELECT i.name FROM DrugForm i")
     List<String> findAllNames();
 
+    List<DrugForm> findByIdIn(List<Long> ids);
+
+
 }

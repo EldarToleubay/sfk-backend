@@ -10,4 +10,6 @@ public interface InnRepository extends JpaRepository<Inn, Long> {
     @Query("SELECT i.name FROM Inn i")
     List<String> findAllNames();
 
+    List<Inn> findByIdIn(List<Long> ids);
+
 }

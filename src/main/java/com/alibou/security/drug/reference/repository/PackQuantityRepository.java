@@ -10,4 +10,7 @@ public interface PackQuantityRepository extends JpaRepository<PackQuantity, Long
     @Query("SELECT i.name FROM PackQuantity i")
     List<String> findAllNames();
 
+    List<PackQuantity> findByIdIn(List<Long> ids);
+
+
 }
