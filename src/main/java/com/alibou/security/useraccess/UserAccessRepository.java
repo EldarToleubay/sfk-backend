@@ -11,4 +11,7 @@ public interface UserAccessRepository extends JpaRepository<UserAccess, Long> {
     @Query("SELECT ua.refId FROM UserAccess ua WHERE ua.user.id = :userId AND ua.refType = :refType")
     List<Long> findRefIdsByUserIdAndRefType(@Param("userId") Long userId, @Param("refType") String refType); // ✅
 
+
+    List<UserAccess> findByUserIdAndRefType(Long userId, String refType);
+
 }

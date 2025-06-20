@@ -9,7 +9,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,19 +25,41 @@ public class UserAccessController {
     @PostMapping("/assign")
     public ResponseEntity<?> assignAccess(@RequestBody AccessAssignmentRequest request) {
         User user = userRepository.findById(request.userId())
-                .orElseThrow();
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        List<UserAccess> accesses = request.refIds().stream()
-                .map(id -> {
-                    UserAccess access = new UserAccess();
-                    access.setUser(user);
-                    access.setRefType(request.refType());
-                    access.setRefId(id);
-                    return access;
-                }).toList();
+        List<UserAccess> allAccesses = new ArrayList<>();
 
-        userAccessRepository.saveAll(accesses);
+        for (AccessAssignmentRequest.AccessEntry accessEntry : request.accesses()) {
+            String refType = accessEntry.refType();
+            List<Long> refIds = accessEntry.refIds();
 
-        return ResponseEntity.ok("Access granted");
+            if (refIds == null || refIds.isEmpty()) continue;
+
+            // Можно убрать дубли перед сохранением (по желанию)
+            Set<Long> existingRefIds = userAccessRepository
+                    .findByUserIdAndRefType(user.getId(), refType)
+                    .stream()
+                    .map(UserAccess::getRefId)
+                    .collect(Collectors.toSet());
+
+            List<UserAccess> newAccesses = refIds.stream()
+                    .filter(id -> !existingRefIds.contains(id))
+                    .map(id -> {
+                        UserAccess ua = new UserAccess();
+                        ua.setUser(user);
+                        ua.setRefType(refType);
+                        ua.setRefId(id);
+                        return ua;
+                    }).toList();
+
+            allAccesses.addAll(newAccesses);
+        }
+
+        if (!allAccesses.isEmpty()) {
+            userAccessRepository.saveAll(allAccesses);
+        }
+
+        return ResponseEntity.ok("Accesses assigned successfully: " + allAccesses.size());
     }
+
 }
