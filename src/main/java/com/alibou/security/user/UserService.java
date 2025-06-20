@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -53,4 +54,12 @@ public class UserService {
                 .toList();
     }
 
+    public String deleteById(Long id) {
+        Optional<User> user = repository.findById(id);
+        if (user.isPresent()) {
+            repository.deleteById(id);
+            return "User " + user.get().getFirstname() + " " + user.get().getLastname() + "removed";
+        }
+        return "User " + id + " not found";
+    }
 }

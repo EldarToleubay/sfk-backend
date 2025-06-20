@@ -29,4 +29,10 @@ public class UserController {
         service.changePassword(request, connectedUser);
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        String response = service.deleteById(id);
+        return ResponseEntity.ok().body(response);
+    }
 }
