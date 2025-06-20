@@ -1,6 +1,7 @@
 package com.alibou.security.useraccess;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -13,5 +14,11 @@ public interface UserAccessRepository extends JpaRepository<UserAccess, Long> {
 
 
     List<UserAccess> findByUserIdAndRefType(Long userId, String refType);
+
+    @Modifying
+    @Query("DELETE FROM UserAccess ua WHERE ua.user.id = :userId")
+    void deleteByUserId(@Param("userId") Long userId);
+
+
 
 }

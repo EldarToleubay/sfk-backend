@@ -2,6 +2,7 @@ package com.alibou.security.useraccess;
 
 import com.alibou.security.user.User;
 import com.alibou.security.user.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,10 +21,14 @@ public class UserAccessController {
     private final UserRepository userRepository;
     private final UserAccessRepository userAccessRepository;
 
+    @Transactional
     @PostMapping("/assign")
     public ResponseEntity<?> assignAccess(@RequestBody AccessAssignmentRequest request) {
         User user = userRepository.findById(request.userId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Полностью удаляем все текущие доступы пользователя
+        userAccessRepository.deleteByUserId(user.getId());
 
         List<UserAccess> allAccesses = new ArrayList<>();
 
@@ -33,31 +38,21 @@ public class UserAccessController {
 
             if (refIds == null || refIds.isEmpty()) continue;
 
-            // Можно убрать дубли перед сохранением (по желанию)
-            Set<Long> existingRefIds = userAccessRepository
-                    .findByUserIdAndRefType(user.getId(), refType)
-                    .stream()
-                    .map(UserAccess::getRefId)
-                    .collect(Collectors.toSet());
-
-            List<UserAccess> newAccesses = refIds.stream()
-                    .filter(id -> !existingRefIds.contains(id))
-                    .map(id -> {
-                        UserAccess ua = new UserAccess();
-                        ua.setUser(user);
-                        ua.setRefType(refType);
-                        ua.setRefId(id);
-                        return ua;
-                    }).toList();
-
-            allAccesses.addAll(newAccesses);
+            for (Long refId : refIds) {
+                UserAccess ua = new UserAccess();
+                ua.setUser(user);
+                ua.setRefType(refType);
+                ua.setRefId(refId);
+                allAccesses.add(ua);
+            }
         }
 
         if (!allAccesses.isEmpty()) {
             userAccessRepository.saveAll(allAccesses);
         }
 
-        return ResponseEntity.ok("Accesses assigned successfully: " + allAccesses.size());
+        return ResponseEntity.ok("Accesses replaced successfully: " + allAccesses.size());
     }
+
 
 }
