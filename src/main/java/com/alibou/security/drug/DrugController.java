@@ -1,6 +1,8 @@
 package com.alibou.security.drug;
 
+import com.google.common.net.HttpHeaders;
 import jakarta.transaction.Transactional;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,13 +22,15 @@ public class DrugController {
     private final ImportService importService;
     private final DrugRepository drugRepository;
     private final ReferenceService referenceService;
+    private final DrugExcelExportService excelExportService;
 
 
-    public DrugController(DrugService drugService, ImportService importService, DrugRepository drugRepository, ReferenceService referenceService) {
+    public DrugController(DrugService drugService, ImportService importService, DrugRepository drugRepository, ReferenceService referenceService, DrugExcelExportService excelExportService) {
         this.drugService = drugService;
         this.importService = importService;
         this.drugRepository = drugRepository;
         this.referenceService = referenceService;
+        this.excelExportService = excelExportService;
     }
 
 
@@ -41,6 +45,18 @@ public class DrugController {
     @PostMapping("/filter")
     public List<DrugExportDto> getFilteredDrugs(@RequestBody DrugFilterRequest request) {
         return drugService.fetchAllWithFilters(request);
+    }
+
+
+    @PostMapping("/export")
+    public ResponseEntity<byte[]> export(@RequestBody DrugFilterRequest request) throws IOException {
+        List<DrugExportDto> drugs = drugService.fetchAllWithFilters(request);
+        byte[] file = excelExportService.exportToExcel(drugs);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=drugs.xlsx")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(file);
     }
 
 
