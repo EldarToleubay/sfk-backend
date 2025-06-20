@@ -21,16 +21,27 @@ public class DrugController {
     private final DrugService drugService;
     private final ImportService importService;
     private final DrugRepository drugRepository;
-    private final ReferenceService referenceService;
     private final DrugExcelExportService excelExportService;
+    private final DrugExcelExportCustomService drugExcelExportCustomService;
 
 
-    public DrugController(DrugService drugService, ImportService importService, DrugRepository drugRepository, ReferenceService referenceService, DrugExcelExportService excelExportService) {
+    public DrugController(DrugService drugService, ImportService importService, DrugRepository drugRepository, DrugExcelExportService excelExportService, DrugExcelExportCustomService drugExcelExportCustomService) {
         this.drugService = drugService;
         this.importService = importService;
         this.drugRepository = drugRepository;
-        this.referenceService = referenceService;
         this.excelExportService = excelExportService;
+        this.drugExcelExportCustomService = drugExcelExportCustomService;
+    }
+
+    @PostMapping("/export-custom")
+    public ResponseEntity<byte[]> exportCustom(@RequestBody DrugExcelExportRequestDTO request) throws IOException {
+        List<DrugExportDto> data = drugService.fetchAllWithFilters(request.getFilter());
+        byte[] file = drugExcelExportCustomService.exportToExcel(data, request.getColumns());
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=filtered_drugs.xlsx")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(file);
     }
 
 
