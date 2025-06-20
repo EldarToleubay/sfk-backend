@@ -117,6 +117,5 @@ public class Drug {
     //24 Price Source
     @Column(name = "price_source", length = 255)
     private String priceSource;
-
 }
 

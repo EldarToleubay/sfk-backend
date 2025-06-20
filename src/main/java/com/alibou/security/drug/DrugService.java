@@ -233,10 +233,21 @@ public class DrugService {
     }
 
 
-    public List<NameValueDto> getTopCompaniesFiltered(DrugFilterRequest filter, String currency) {
+    public List<NameValueDto> getTopMolecules(DrugFilterRequest filter, String metric) {
         Pageable topFive = PageRequest.of(0, 5);
-        return drugRepository.findTopCompaniesWithFilters(filter, currency, topFive);
+        return drugRepository.findTopByGroupFieldWithFilters(filter, metric, "inn", topFive);
     }
+
+    public List<NameValueDto> getTopProducts(DrugFilterRequest filter, String metric) {
+        Pageable topFive = PageRequest.of(0, 5);
+        return drugRepository.findTopByGroupFieldWithFilters(filter, metric, "tradeName", topFive);
+    }
+
+    public List<NameValueDto> getTopCompanies(DrugFilterRequest filter, String metric) {
+        Pageable topFive = PageRequest.of(0, 5);
+        return drugRepository.findTopByGroupFieldWithFilters(filter, metric, "manufacturingCompany", topFive);
+    }
+
 
 
 //

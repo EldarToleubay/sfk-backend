@@ -65,18 +65,25 @@ public class DrugController {
         return drugRepository.count();
     }
 
-//    @GetMapping("/top-companies")
+    //    @GetMapping("/top-companies")
 //    public List<NameValueDto> getTopCompanies(
 //            @RequestParam(defaultValue = "usd") String currency
 //    ) {
 //        return drugService.getTopCompanies(currency);
 //    }
+    @PostMapping("/top-molecules")
+    public List<NameValueDto> topMolecules(@RequestBody DrugFilterRequest request, @RequestParam String metric) {
+        return drugService.getTopMolecules(request, metric);
+    }
+
+    @PostMapping("/top-products")
+    public List<NameValueDto> topProducts(@RequestBody DrugFilterRequest request, @RequestParam String metric) {
+        return drugService.getTopProducts(request, metric);
+    }
 
     @PostMapping("/top-companies")
-    public List<NameValueDto> getTopCompanies(@RequestBody DrugFilterRequest request,
-                                              @RequestParam(defaultValue = "usd") String currency
-    ) {
-        return drugService.getTopCompaniesFiltered(request, currency);
+    public List<NameValueDto> topCompanies(@RequestBody DrugFilterRequest request, @RequestParam String metric) {
+        return drugService.getTopCompanies(request, metric);
     }
 
 

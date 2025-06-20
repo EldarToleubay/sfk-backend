@@ -36,7 +36,21 @@ public class UserService {
         repository.save(user);
     }
 
-    public List<User> findAll() {
-        return repository.findAll();
+    public List<UserDto> findAll() {
+        List<User> users = repository.findAll();
+        return convertToDtoList(users);
     }
+
+    public List<UserDto> convertToDtoList(List<User> users) {
+        return users.stream()
+                .map(user -> UserDto.builder()
+                        .id(user.getId())
+                        .firstname(user.getFirstname())
+                        .lastname(user.getLastname())
+                        .email(user.getEmail())
+                        .role(user.getRole())
+                        .build())
+                .toList();
+    }
+
 }

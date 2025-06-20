@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,13 +21,14 @@ public class DrugRepositoryImpl implements DrugRepositoryCustom {
     private final EntityManager em;
 
     @Override
-    public List<NameValueDto> findTopCompaniesWithFilters(DrugFilterRequest filter, String currency, Pageable pageable) {
+    public List<NameValueDto> findTopByGroupFieldWithFilters(DrugFilterRequest filter, String metric, String groupField, Pageable pageable) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<NameValueDto> cq = cb.createQuery(NameValueDto.class);
         Root<Drug> root = cq.from(Drug.class);
 
         List<Predicate> predicates = new ArrayList<>();
 
+        // Фильтры
         if (filter.getInn() != null && !filter.getInn().isEmpty()) {
             predicates.add(root.get("inn").in(filter.getInn()));
         }
@@ -66,28 +66,21 @@ public class DrugRepositoryImpl implements DrugRepositoryCustom {
             predicates.add(cb.lessThanOrEqualTo(root.get("importDate"), filter.getDateTo()));
         }
 
-        // Группировка
-        Expression<String> companyGroup = root.get("manufacturingCompany");
+        // Группировка по переданному полю (например, inn, tradeName, manufacturingCompany)
+        Expression<String> groupByField = root.get(groupField);
 
-        // Выбор поля по валюте
-        Expression<BigDecimal> valueExpression = currency.equalsIgnoreCase("usd")
-                ? root.get("valueInUsd")
-                : root.get("valueInGel");
+        // Метрика: valueInUsd, valueInGel, volumeInSU, importDate, priceSource
+        Expression<? extends Number> metricExpr = root.get(metric);
+        Expression<Number> sumValue = cb.sum((Expression<Number>) metricExpr);
 
-        Expression<BigDecimal> sumValue = cb.sum(valueExpression);
 
-        cq.select(cb.construct(
-                        NameValueDto.class,
-                        companyGroup,
-                        sumValue
-                ))
+        // SELECT groupByField, SUM(metric)
+        cq.select(cb.construct(NameValueDto.class, groupByField, sumValue))
                 .where(predicates.toArray(new Predicate[0]))
-                .groupBy(companyGroup)
+                .groupBy(groupByField)
                 .orderBy(cb.desc(sumValue));
 
         TypedQuery<NameValueDto> query = em.createQuery(cq);
-
-        // пагинация
         query.setFirstResult((int) pageable.getOffset());
         query.setMaxResults(pageable.getPageSize());
 
