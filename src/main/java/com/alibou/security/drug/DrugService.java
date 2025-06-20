@@ -18,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -167,7 +168,7 @@ public class DrugService {
         return drugRepository.findAll(pageRequest);
     }
 
-    public List<Drug> fetchAllWithFilters(DrugFilterRequest request) {
+    public List<DrugExportDto> fetchAllWithFilters(DrugFilterRequest request) {
         Specification<Drug> spec = Specification.where(null);
 
         spec = addListFilter(spec, request.getInn(), "inn");
@@ -189,8 +190,39 @@ public class DrugService {
             spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("importDate"), request.getDateTo()));
         }
 
-        return drugRepository.findAll(spec);
+        List<Drug> drugs = drugRepository.findAll(spec);
+
+        return drugs.stream()
+                .map(d -> new DrugExportDto(
+                        d.getSegment(),
+                        d.getTradeName(),
+                        d.getManufacturingCompany(),
+                        d.getDrugForm(),
+                        d.getDosage(),
+                        d.getPackQuantity(),
+                        d.getInn(),
+                        d.getAtc1(),
+                        d.getAtc2(),
+                        d.getAtc3(),
+                        d.getImportDate(),
+                        d.getYear(),
+                        d.getPersonWithTradingLicense(),
+                        d.getPersonInterestedInRegistrationGeorgiaStand(),
+                        d.getInterestedParty(),
+                        d.getRxOtc(),
+                        d.getModeOfRegistration(),
+                        d.getSku(),
+                        d.getVolumeInUnits(),
+                        d.getPricePerUnitLari(),
+                        d.getPricePerUnitUsd(),
+                        d.getValueInGel(),
+                        d.getValueInUsd(),
+                        d.getVolumeInSU(),
+                        d.getPriceSource()
+                ))
+                .toList();
     }
+
 
 
     private Specification<Drug> addListFilter(Specification<Drug> spec, List<String> values, String field) {

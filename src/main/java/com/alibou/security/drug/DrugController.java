@@ -39,7 +39,7 @@ public class DrugController {
 
 
     @PostMapping("/filter")
-    public List<Drug> getFilteredDrugs(@RequestBody DrugFilterRequest request) {
+    public List<DrugExportDto> getFilteredDrugs(@RequestBody DrugFilterRequest request) {
         return drugService.fetchAllWithFilters(request);
     }
 
