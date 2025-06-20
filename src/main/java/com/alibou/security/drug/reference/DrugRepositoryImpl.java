@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,9 +28,52 @@ public class DrugRepositoryImpl implements DrugRepositoryCustom {
         CriteriaQuery<NameValueDto> cq = cb.createQuery(NameValueDto.class);
         Root<Drug> root = cq.from(Drug.class);
 
+        List<Predicate> predicates = buildPredicates(cb, root, filter);
+
+        // Группировка по переданному полю (например, inn, tradeName, manufacturingCompany)
+        Expression<String> groupByField = root.get(groupField);
+        Expression<? extends Number> metricExpr = root.get(metric);
+        Expression<Number> sumValue = cb.sum((Expression<Number>) metricExpr);
+
+        cq.select(cb.construct(NameValueDto.class, groupByField, sumValue, cb.literal(BigDecimal.ZERO)))
+                .where(predicates.toArray(new Predicate[0]))
+                .groupBy(groupByField)
+                .orderBy(cb.desc(sumValue));
+
+        TypedQuery<NameValueDto> query = em.createQuery(cq);
+        query.setFirstResult((int) pageable.getOffset());
+        query.setMaxResults(pageable.getPageSize());
+
+        List<NameValueDto> topResults = query.getResultList();
+
+        // ➕ Общая сумма по фильтру (без группировки)
+        CriteriaQuery<BigDecimal> totalQuery = cb.createQuery(BigDecimal.class);
+        Root<Drug> totalRoot = totalQuery.from(Drug.class);
+        Expression<? extends Number> totalMetricExpr = totalRoot.get(metric);
+        Expression<BigDecimal> totalSumValue = cb.sum((Expression<BigDecimal>) totalMetricExpr);
+        totalQuery.select(cb.coalesce(totalSumValue, BigDecimal.ZERO))
+                .where(buildPredicates(cb, totalRoot, filter).toArray(new Predicate[0]));
+
+        BigDecimal total = em.createQuery(totalQuery).getSingleResult();
+        if (total == null || BigDecimal.ZERO.compareTo(total) == 0) {
+            total = BigDecimal.ONE; // чтобы не делить на 0
+        }
+
+        // ➕ Вычисляем проценты
+        for (NameValueDto dto : topResults) {
+            BigDecimal percent = dto.getTotalValue()
+                    .multiply(BigDecimal.valueOf(100))
+                    .divide(total, 2, RoundingMode.HALF_UP);
+            dto.setTotalValueInPercent(percent);
+        }
+
+        return topResults;
+    }
+
+
+    private List<Predicate> buildPredicates(CriteriaBuilder cb, Root<Drug> root, DrugFilterRequest filter) {
         List<Predicate> predicates = new ArrayList<>();
 
-        // Фильтры
         if (filter.getInn() != null && !filter.getInn().isEmpty()) {
             predicates.add(root.get("inn").in(filter.getInn()));
         }
@@ -66,24 +111,7 @@ public class DrugRepositoryImpl implements DrugRepositoryCustom {
             predicates.add(cb.lessThanOrEqualTo(root.get("importDate"), filter.getDateTo()));
         }
 
-        // Группировка по переданному полю (например, inn, tradeName, manufacturingCompany)
-        Expression<String> groupByField = root.get(groupField);
-
-        // Метрика: valueInUsd, valueInGel, volumeInSU, importDate, priceSource
-        Expression<? extends Number> metricExpr = root.get(metric);
-        Expression<Number> sumValue = cb.sum((Expression<Number>) metricExpr);
-
-
-        // SELECT groupByField, SUM(metric)
-        cq.select(cb.construct(NameValueDto.class, groupByField, sumValue))
-                .where(predicates.toArray(new Predicate[0]))
-                .groupBy(groupByField)
-                .orderBy(cb.desc(sumValue));
-
-        TypedQuery<NameValueDto> query = em.createQuery(cq);
-        query.setFirstResult((int) pageable.getOffset());
-        query.setMaxResults(pageable.getPageSize());
-
-        return query.getResultList();
+        return predicates;
     }
+
 }

@@ -97,6 +97,18 @@ public class DrugController {
         return drugService.getTopCompanies(request, metric);
     }
 
+    @PostMapping("/top-atc1")
+    public List<NameValueDto> topAtc1(@RequestBody DrugFilterRequest request, @RequestParam String metric) {
+        return drugService.getTopAtc1(request, metric);
+    }
+
+
+    @PostMapping("/top-segment")
+    public List<NameValueDto> topSegment(@RequestBody DrugFilterRequest request, @RequestParam String metric) {
+        return drugService.getTopSegment(request, metric);
+    }
+
+
 
     @PostMapping("/upload-async")
     public ResponseEntity<String> uploadFileAsync(@RequestParam("file") MultipartFile file) throws IOException {

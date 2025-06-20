@@ -248,6 +248,15 @@ public class DrugService {
         return drugRepository.findTopByGroupFieldWithFilters(filter, metric, "manufacturingCompany", topFive);
     }
 
+    public List<NameValueDto> getTopAtc1(DrugFilterRequest filter, String metric) {
+        Pageable topFive = PageRequest.of(0, 3);
+        return drugRepository.findTopByGroupFieldWithFilters(filter, metric, "atc1", topFive);
+    }
+
+    public List<NameValueDto> getTopSegment(DrugFilterRequest filter, String metric) {
+        Pageable topFive = PageRequest.of(0, 3);
+        return drugRepository.findTopByGroupFieldWithFilters(filter, metric, "segment", topFive);
+    }
 
 
 //
