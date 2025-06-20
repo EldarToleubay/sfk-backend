@@ -23,6 +23,25 @@ public class DrugRepositoryImpl implements DrugRepositoryCustom {
     private final EntityManager em;
 
     @Override
+    public BigDecimal getTotalMetricWithFilters(DrugFilterRequest filter, String metric) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<BigDecimal> totalQuery = cb.createQuery(BigDecimal.class);
+        Root<Drug> root = totalQuery.from(Drug.class);
+
+        List<Predicate> predicates = buildPredicates(cb, root, filter);
+
+        Expression<? extends Number> metricExpr = root.get(metric);
+        Expression<BigDecimal> totalSum = cb.sum((Expression<BigDecimal>) metricExpr);
+
+        totalQuery.select(cb.coalesce(totalSum, BigDecimal.ZERO))
+                .where(predicates.toArray(new Predicate[0]));
+
+        BigDecimal result = em.createQuery(totalQuery).getSingleResult();
+        return result != null ? result : BigDecimal.ZERO;
+    }
+
+
+    @Override
     public List<NameValueDto> findTopByGroupFieldWithFilters(DrugFilterRequest filter, String metric, String groupField, Pageable pageable) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<NameValueDto> cq = cb.createQuery(NameValueDto.class);

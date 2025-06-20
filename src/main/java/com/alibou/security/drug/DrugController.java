@@ -10,6 +10,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -108,6 +110,17 @@ public class DrugController {
         return drugService.getTopSegment(request, metric);
     }
 
+
+    @PostMapping("/total-values")
+    public List<NameValueDto> topSegment(@RequestBody DrugFilterRequest request) {
+        BigDecimal totalMarketValue = drugRepository.getTotalMetricWithFilters(request, "valueInUsd");
+        BigDecimal totalUnits = drugRepository.getTotalMetricWithFilters(request, "volumeInSU");
+
+        List<NameValueDto> result = new ArrayList<>();
+        result.add(new NameValueDto("Total Market Value", totalMarketValue, BigDecimal.valueOf(100)));
+        result.add(new NameValueDto("Standard Units", totalUnits, BigDecimal.valueOf(100)));
+        return result;
+    }
 
 
     @PostMapping("/upload-async")
