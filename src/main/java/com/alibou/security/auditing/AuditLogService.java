@@ -5,7 +5,14 @@ import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,9 +25,28 @@ public class AuditLogService {
     private final JwtService jwtService;
 
 
-    public List<AuditLog> getAll() {
-        return auditLogRepository.findAll();
+    public Page<AuditLogDto> search(String username,
+                                    String method,
+                                    String endpoint,
+                                    Integer statusCode,
+                                    LocalDateTime from,
+                                    LocalDateTime to,
+                                    Pageable pageable) {
+        return auditLogRepository.search(username, method, endpoint, statusCode, from, to, pageable)
+                .map(this::toDto);
     }
+
+    private AuditLogDto toDto(AuditLog log) {
+        return new AuditLogDto(
+                log.getId(),
+                log.getUsername(),
+                log.getMethod(),
+                log.getEndpoint(),
+                log.getStatusCode(),
+                log.getTimestamp()
+        );
+    }
+
 
     public void logRequest(HttpServletRequest request,
                            HttpServletResponse response,

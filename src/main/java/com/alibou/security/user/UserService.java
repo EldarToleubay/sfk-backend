@@ -1,5 +1,8 @@
 package com.alibou.security.user;
 
+import com.alibou.security.token.TokenRepository;
+import com.alibou.security.useraccess.UserAccessRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,6 +19,8 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository repository;
+    private final UserAccessRepository userAccessRepository;
+    private final TokenRepository tokenRepository;
 
     public void changePassword(ChangePasswordRequest request, Principal connectedUser) {
 
@@ -53,10 +58,12 @@ public class UserService {
                         .build())
                 .toList();
     }
-
+    @Transactional
     public String deleteById(Long id) {
         Optional<User> user = repository.findById(id);
         if (user.isPresent()) {
+            userAccessRepository.deleteByUserId(id);
+            tokenRepository.deleteByUserId(id);
             repository.deleteById(id);
             return "User " + user.get().getFirstname() + " " + user.get().getLastname() + "removed";
         }
