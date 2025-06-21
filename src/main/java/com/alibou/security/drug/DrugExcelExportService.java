@@ -39,10 +39,25 @@ public class DrugExcelExportService {
                 "SKU", "Volume Units", "Price Lari", "Price USD",
                 "Value GEL", "Value USD", "Volume SU", "Price Source"
         };
+
+        Workbook workbook = sheet.getWorkbook();
+
+        // Создание жирного шрифта
+        Font headerFont = workbook.createFont();
+        headerFont.setBold(true);
+
+        // Создание стиля с этим шрифтом
+        CellStyle headerStyle = workbook.createCellStyle();
+        headerStyle.setFont(headerFont);
+
+        // Установка заголовков с жирным стилем
         for (int i = 0; i < columns.length; i++) {
-            header.createCell(i).setCellValue(columns[i]);
+            Cell cell = header.createCell(i);
+            cell.setCellValue(columns[i]);
+            cell.setCellStyle(headerStyle);
         }
     }
+
 
     private void fillRow(Row row, DrugExportDto d) {
         int i = 0;

@@ -30,11 +30,56 @@ public class DrugExcelExportCustomService {
     }
 
     private void createHeader(Sheet sheet, List<String> columns) {
+        Workbook workbook = sheet.getWorkbook();
+
+        // Жирный шрифт
+        Font headerFont = workbook.createFont();
+        headerFont.setBold(true);
+
+        CellStyle headerStyle = workbook.createCellStyle();
+        headerStyle.setFont(headerFont);
+
         Row header = sheet.createRow(0);
         for (int i = 0; i < columns.size(); i++) {
-            header.createCell(i).setCellValue(columns.get(i));
+            String columnKey = columns.get(i);
+            String displayName = mapColumnToHeader(columnKey); // преобразуем в красивый заголовок
+            Cell cell = header.createCell(i);
+            cell.setCellValue(displayName);
+            cell.setCellStyle(headerStyle);
         }
     }
+
+    private String mapColumnToHeader(String key) {
+        return switch (key) {
+            case "segment" -> "Segment";
+            case "tradeName" -> "Trade Name";
+            case "manufacturingCompany" -> "Company";
+            case "drugForm" -> "Form";
+            case "dosage" -> "Dosage";
+            case "packQuantity" -> "Pack Qty";
+            case "inn" -> "INN";
+            case "atc1" -> "ATC1";
+            case "atc2" -> "ATC2";
+            case "atc3" -> "ATC3";
+            case "importDate" -> "Import Date";
+            case "year" -> "Year";
+            case "personWithTradingLicense" -> "License";
+            case "personInterestedInRegistrationGeorgiaStand" -> "Interested Stand";
+            case "interestedParty" -> "Interested Party";
+            case "rxOtc" -> "Rx/OTC";
+            case "modeOfRegistration" -> "Mode";
+            case "sku" -> "SKU";
+            case "volumeInUnits" -> "Volume Units";
+            case "pricePerUnitLari" -> "Price Lari";
+            case "pricePerUnitUsd" -> "Price USD";
+            case "valueInGel" -> "Value GEL";
+            case "valueInUsd" -> "Value USD";
+            case "volumeInSU" -> "Volume SU";
+            case "priceSource" -> "Price Source";
+            default -> key;
+        };
+    }
+
 
     private void fillRow(Row row, DrugExportDto d, List<String> columns) {
         int i = 0;
