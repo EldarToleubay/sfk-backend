@@ -16,18 +16,28 @@ public class DrugExcelExportCustomService {
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Drugs");
 
+            // Создание заголовков
             createHeader(sheet, columns);
+
+            // Заполнение строк
             int rowIdx = 1;
             for (DrugExportDto dto : drugs) {
                 Row row = sheet.createRow(rowIdx++);
                 fillRow(row, dto, columns);
             }
 
+            // Автоширина всех переданных колонок
+            for (int i = 0; i < columns.size(); i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            // Запись в байтовый массив
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             workbook.write(out);
             return out.toByteArray();
         }
     }
+
 
     private void createHeader(Sheet sheet, List<String> columns) {
         Workbook workbook = sheet.getWorkbook();
