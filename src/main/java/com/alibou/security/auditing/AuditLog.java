@@ -27,13 +27,7 @@ public class AuditLog {
     private String endpoint;
     private String ipAddress;
 
-    @Lob
-    private String requestBody;
-
     private int statusCode;
     private LocalDateTime timestamp;
-
-    @Lob
-    private String errorMessage;
 
 }

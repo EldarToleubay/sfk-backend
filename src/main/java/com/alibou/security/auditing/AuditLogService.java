@@ -25,6 +25,7 @@ public class AuditLogService {
     private final JwtService jwtService;
 
 
+
     public Page<AuditLogDto> search(String username,
                                     String method,
                                     String endpoint,
@@ -78,10 +79,8 @@ public class AuditLogService {
                 .method(request.getMethod())
                 .endpoint(request.getRequestURI())
                 .ipAddress(request.getRemoteAddr())
-                .requestBody(body)
                 .statusCode(response.getStatus())
                 .timestamp(LocalDateTime.now())
-                .errorMessage(exception != null ? exception.getMessage() : null)
                 .build();
 
         auditLogRepository.save(log);
