@@ -47,6 +47,11 @@ public class DrugController {
     }
 
 
+    @GetMapping("/{name}")
+    public List<Drug> filerBy(){
+        return new ArrayList<>();
+    }
+
     @DeleteMapping("/remove")
     @Transactional
     public String removeAllDrugs() {

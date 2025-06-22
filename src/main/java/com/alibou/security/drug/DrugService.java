@@ -245,7 +245,7 @@ public class DrugService {
 
     public List<NameValueDto> getTopCompanies(DrugFilterRequest filter, String metric) {
         Pageable topFive = PageRequest.of(0, 5);
-        return drugRepository.findTopByGroupFieldWithFilters(filter, metric, "manufacturingCompany", topFive);
+        return drugRepository.findTopByGroupFieldWithFilters(filter, metric, "personWithTradingLicense", topFive);
     }
 
     public List<NameValueDto> getTopAtc1(DrugFilterRequest filter, String metric) {
