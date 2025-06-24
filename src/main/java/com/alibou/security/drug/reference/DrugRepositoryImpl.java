@@ -43,6 +43,9 @@ public class DrugRepositoryImpl implements DrugRepositoryCustom {
 
     @Override
     public List<NameValueDto> findTopByGroupFieldWithFilters(DrugFilterRequest filter, String metric, String groupField, Pageable pageable) {
+        if (isFilterEmpty(filter)) {
+            return List.of(new NameValueDto("UNKNOWN", BigDecimal.ZERO, BigDecimal.ZERO));
+        }
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<NameValueDto> cq = cb.createQuery(NameValueDto.class);
         Root<Drug> root = cq.from(Drug.class);
@@ -131,6 +134,20 @@ public class DrugRepositoryImpl implements DrugRepositoryCustom {
         }
 
         return predicates;
+    }
+
+
+    private boolean isFilterEmpty(DrugFilterRequest filter) {
+        return (filter.getInn().isEmpty() &&
+                filter.getSegment().isEmpty() &&
+                filter.getTradeName().isEmpty() &&
+                filter.getManufacturingCompany().isEmpty() &&
+                filter.getDrugForm().isEmpty() &&
+                filter.getDosage().isEmpty() &&
+                filter.getPackQuantity().isEmpty() &&
+                filter.getAtc1().isEmpty() &&
+                filter.getAtc2().isEmpty() &&
+                filter.getAtc3().isEmpty());
     }
 
 }
