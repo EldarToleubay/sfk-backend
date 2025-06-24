@@ -43,6 +43,7 @@ public class AuditLogService {
                 log.getUsername(),
                 log.getMethod(),
                 log.getEndpoint(),
+                log.getRole(),
                 log.getStatusCode(),
                 log.getTimestamp()
         );

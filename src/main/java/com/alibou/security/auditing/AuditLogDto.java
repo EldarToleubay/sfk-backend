@@ -7,6 +7,7 @@ public record AuditLogDto(
         String username,
         String method,
         String endpoint,
+        String role,
         int statusCode,
         LocalDateTime timestamp
 ) {}
