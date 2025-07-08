@@ -7,42 +7,82 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class DrugExcelExportCustomService {
 
-    public byte[] exportToExcel(List<DrugExportDto> drugs, List<String> columns) throws IOException {
+    // Фиксированный порядок колонок, как в UI
+    private static final List<String> DEFAULT_COLUMNS_ORDER = List.of(
+            "year", "segment", "tradeName", "manufacturingCompany",
+            "personWithTradingLicense", "personInterestedInRegistrationGeorgiaStand", "interestedParty", "rxOtc",
+            "modeOfRegistration", "sku", "drugForm", "dosage", "packQuantity", "inn",
+            "atc1", "atc2", "atc3", "pricePerUnitLari", "pricePerUnitUsd",
+            "importDate", "priceSource", "volumeInUnits", "volumeInSU", "valueInGel", "valueInUsd"
+    );
+
+    // Отображение ключей в заголовки
+    private static final Map<String, String> COLUMN_HEADERS = new LinkedHashMap<>() {{
+        put("year", "Year");
+        put("segment", "Segment");
+        put("tradeName", "Trade Name");
+        put("manufacturingCompany", "Manufacturing company");
+        put("personWithTradingLicense", "Person with trading license");
+        put("personInterestedInRegistrationGeorgiaStand", "Person interested in registration in Georgia");
+        put("interestedParty", "Interested party (entity seeking registration in Georgia)");
+        put("rxOtc", "Rx/OTC");
+        put("modeOfRegistration", "Mode of registration");
+        put("sku", "SKU");
+        put("drugForm", "Drug Form");
+        put("dosage", "Dosage");
+        put("packQuantity", "Pack quantity");
+        put("inn", "INN");
+        put("atc1", "ATC1 WHO");
+        put("atc2", "ATC2 WHO");
+        put("atc3", "ATC3 WHO");
+        put("pricePerUnitLari", "Price per Unit, in Lari");
+        put("pricePerUnitUsd", "Price per unit, in USD");
+        put("importDate", "Import date");
+        put("priceSource", "Price Source");
+        put("volumeInUnits", "Volume Units");
+        put("volumeInSU", "Volume SU");
+        put("valueInGel", "Value GEL");
+        put("valueInUsd", "Value USD");
+    }};
+
+    public byte[] exportToExcel(List<DrugExportDto> drugs, List<String> selectedColumns) throws IOException {
+        // Упорядочиваем выбранные колонки по дефолтному порядку
+        List<String> columns = DEFAULT_COLUMNS_ORDER.stream()
+                .filter(selectedColumns::contains)
+                .collect(Collectors.toList());
+
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Drugs");
 
-            // Создание заголовков
             createHeader(sheet, columns);
 
-            // Заполнение строк
             int rowIdx = 1;
             for (DrugExportDto dto : drugs) {
                 Row row = sheet.createRow(rowIdx++);
                 fillRow(row, dto, columns);
             }
 
-            // Автоширина всех переданных колонок
             for (int i = 0; i < columns.size(); i++) {
                 sheet.autoSizeColumn(i);
             }
 
-            // Запись в байтовый массив
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             workbook.write(out);
             return out.toByteArray();
         }
     }
 
-
     private void createHeader(Sheet sheet, List<String> columns) {
         Workbook workbook = sheet.getWorkbook();
 
-        // Жирный шрифт
         Font headerFont = workbook.createFont();
         headerFont.setBold(true);
 
@@ -52,44 +92,12 @@ public class DrugExcelExportCustomService {
         Row header = sheet.createRow(0);
         for (int i = 0; i < columns.size(); i++) {
             String columnKey = columns.get(i);
-            String displayName = mapColumnToHeader(columnKey); // преобразуем в красивый заголовок
+            String displayName = COLUMN_HEADERS.getOrDefault(columnKey, columnKey);
             Cell cell = header.createCell(i);
             cell.setCellValue(displayName);
             cell.setCellStyle(headerStyle);
         }
     }
-
-    private String mapColumnToHeader(String key) {
-        return switch (key) {
-            case "segment" -> "Segment";
-            case "tradeName" -> "Trade Name";
-            case "manufacturingCompany" -> "Company";
-            case "drugForm" -> "Form";
-            case "dosage" -> "Dosage";
-            case "packQuantity" -> "Pack Qty";
-            case "inn" -> "INN";
-            case "atc1" -> "ATC1";
-            case "atc2" -> "ATC2";
-            case "atc3" -> "ATC3";
-            case "importDate" -> "Import Date";
-            case "year" -> "Year";
-            case "personWithTradingLicense" -> "License";
-            case "personInterestedInRegistrationGeorgiaStand" -> "Interested Stand";
-            case "interestedParty" -> "Interested Party";
-            case "rxOtc" -> "Rx/OTC";
-            case "modeOfRegistration" -> "Mode";
-            case "sku" -> "SKU";
-            case "volumeInUnits" -> "Volume Units";
-            case "pricePerUnitLari" -> "Price Lari";
-            case "pricePerUnitUsd" -> "Price USD";
-            case "valueInGel" -> "Value GEL";
-            case "valueInUsd" -> "Value USD";
-            case "volumeInSU" -> "Volume SU";
-            case "priceSource" -> "Price Source";
-            default -> key;
-        };
-    }
-
 
     private void fillRow(Row row, DrugExportDto d, List<String> columns) {
         int i = 0;
@@ -109,8 +117,7 @@ public class DrugExcelExportCustomService {
                 case "importDate" -> cell.setCellValue(d.getImportDate() != null ? d.getImportDate().toString() : "");
                 case "year" -> cell.setCellValue(d.getYear() != null ? d.getYear() : 0);
                 case "personWithTradingLicense" -> cell.setCellValue(d.getPersonWithTradingLicense());
-                case "personInterestedInRegistrationGeorgiaStand" ->
-                        cell.setCellValue(d.getPersonInterestedInRegistrationGeorgiaStand());
+                case "personInterestedInRegistrationGeorgiaStand" -> cell.setCellValue(d.getPersonInterestedInRegistrationGeorgiaStand());
                 case "interestedParty" -> cell.setCellValue(d.getInterestedParty());
                 case "rxOtc" -> cell.setCellValue(d.getRxOtc());
                 case "modeOfRegistration" -> cell.setCellValue(d.getModeOfRegistration());
