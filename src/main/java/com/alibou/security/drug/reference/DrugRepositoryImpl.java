@@ -126,6 +126,29 @@ public class DrugRepositoryImpl implements DrugRepositoryCustom {
         if (filter.getAtc3() != null && !filter.getAtc3().isEmpty()) {
             predicates.add(root.get("atc3").in(filter.getAtc3()));
         }
+
+        if (filter.getPersonWithTradingLicense() != null && !filter.getPersonWithTradingLicense().isEmpty()) {
+            predicates.add(root.get("personWithTradingLicense").in(filter.getPersonWithTradingLicense()));
+        }
+        if (filter.getPersonInterestedInRegistrationGeorgiaStand() != null && !filter.getPersonInterestedInRegistrationGeorgiaStand().isEmpty()) {
+            predicates.add(root.get("personInterestedInRegistrationGeorgiaStand").in(filter.getPersonInterestedInRegistrationGeorgiaStand()));
+        }
+        if (filter.getInterestedParty() != null && !filter.getInterestedParty().isEmpty()) {
+            predicates.add(root.get("interestedParty").in(filter.getInterestedParty()));
+        }
+        if (filter.getRxOtc() != null && !filter.getRxOtc().isEmpty()) {
+            predicates.add(root.get("rxOtc").in(filter.getRxOtc()));
+        }
+        if (filter.getModeOfRegistration() != null && !filter.getModeOfRegistration().isEmpty()) {
+            predicates.add(root.get("modeOfRegistration").in(filter.getModeOfRegistration()));
+        }
+        if (filter.getSku() != null && !filter.getSku().isEmpty()) {
+            predicates.add(root.get("sku").in(filter.getSku()));
+        }
+        if (filter.getPriceSource() != null && !filter.getPriceSource().isEmpty()) {
+            predicates.add(root.get("priceSource").in(filter.getPriceSource()));
+        }
+
         if (filter.getDateFrom() != null) {
             predicates.add(cb.greaterThanOrEqualTo(root.get("importDate"), filter.getDateFrom()));
         }
@@ -147,7 +170,15 @@ public class DrugRepositoryImpl implements DrugRepositoryCustom {
                 filter.getPackQuantity().isEmpty() &&
                 filter.getAtc1().isEmpty() &&
                 filter.getAtc2().isEmpty() &&
-                filter.getAtc3().isEmpty());
+                filter.getAtc3().isEmpty() &&
+                filter.getPersonWithTradingLicense().isEmpty() &&
+                filter.getPersonInterestedInRegistrationGeorgiaStand().isEmpty() &&
+                filter.getInterestedParty().isEmpty() &&
+                filter.getRxOtc().isEmpty() &&
+                filter.getModeOfRegistration().isEmpty() &&
+                filter.getSku().isEmpty() &&
+                filter.getPriceSource().isEmpty());
     }
+
 
 }

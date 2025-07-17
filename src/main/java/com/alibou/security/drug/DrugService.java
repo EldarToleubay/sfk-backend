@@ -182,6 +182,15 @@ public class DrugService {
         spec = addListFilter(spec, request.getAtc2(), "atc2");
         spec = addListFilter(spec, request.getAtc3(), "atc3");
 
+        spec = addListFilter(spec, request.getPersonWithTradingLicense(), "personWithTradingLicense");
+        spec = addListFilter(spec, request.getPersonInterestedInRegistrationGeorgiaStand(), "personInterestedInRegistrationGeorgiaStand");
+        spec = addListFilter(spec, request.getInterestedParty(), "interestedParty");
+        spec = addListFilter(spec, request.getRxOtc(), "rxOtc");
+        spec = addListFilter(spec, request.getModeOfRegistration(), "modeOfRegistration");
+        spec = addListFilter(spec, request.getSku(), "sku");
+        spec = addListFilter(spec, request.getPriceSource(), "priceSource");
+
+
         if (request.getDateFrom() != null) {
             spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("importDate"), request.getDateFrom()));
         }

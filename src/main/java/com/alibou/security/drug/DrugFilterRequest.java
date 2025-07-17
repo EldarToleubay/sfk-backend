@@ -20,6 +20,14 @@ public class DrugFilterRequest {
     private List<String> atc2= new ArrayList<>();
     private List<String> atc3= new ArrayList<>();
 
+    private List<String> personWithTradingLicense = new ArrayList<>();
+    private List<String> personInterestedInRegistrationGeorgiaStand = new ArrayList<>();
+    private List<String> interestedParty = new ArrayList<>();
+    private List<String> rxOtc = new ArrayList<>();
+    private List<String> modeOfRegistration = new ArrayList<>();
+    private List<String> sku = new ArrayList<>();
+    private List<String> priceSource = new ArrayList<>();
+
     private LocalDate dateFrom;
     private LocalDate dateTo;
 }
