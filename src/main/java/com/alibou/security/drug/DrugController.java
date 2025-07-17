@@ -1,7 +1,7 @@
 package com.alibou.security.drug;
 
-import com.google.common.net.HttpHeaders;
 import jakarta.transaction.Transactional;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

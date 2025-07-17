@@ -6,10 +6,9 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface InnRepository extends JpaRepository<Inn, Long> {
-    @Query("SELECT i.name FROM Inn i")
+public interface InterestedPartyRepository extends JpaRepository<InterestedParty, Long> {
+    @Query("SELECT i.name FROM InterestedParty i")
     List<String> findAllNames();
 
-    List<Inn> findByIdIn(List<Long> ids);
-
+    List<InterestedParty> findByIdIn(List<Long> ids);
 }
