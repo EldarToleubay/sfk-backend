@@ -2,6 +2,7 @@ package com.alibou.security.drug;
 
 
 import com.alibou.security.drug.reference.*;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -73,6 +74,48 @@ public class ReferenceController {
     public List<TradeName> tradeName() {
         return referenceService.getAllTradeName();
     }
+
+
+    @Operation(tags = "Новые справочники")
+    @GetMapping("/person-with-trading-license")
+    public List<PersonWithTradingLicense> personWithTradingLicense() {
+        return referenceService.getAllPersonWithTradingLicense();
+    }
+
+    @Operation(tags = "Новые справочники")
+    @GetMapping("/person-interested-in-registration-georgia-stand")
+    public List<PersonInterestedInRegistrationGeorgiaStand> personInterestedInRegistrationGeorgiaStand() {
+        return referenceService.getAllPersonInterestedInRegistrationGeorgiaStand();
+    }
+
+    @Operation(tags = "Новые справочники")
+    @GetMapping("/interested-party")
+    public List<InterestedParty> interestedParty() {
+        return referenceService.getAllInterestedParty();
+    }
+    @Operation(tags = "Новые справочники")
+    @GetMapping("/rx-otc")
+    public List<RxOtc> rxOtc() {
+        return referenceService.getAllRxOtc();
+    }
+    @Operation(tags = "Новые справочники")
+    @GetMapping("/mode-of-registration")
+    public List<ModeOfRegistration> modeOfRegistration() {
+        return referenceService.getAllModeOfRegistration();
+    }
+
+    @Operation(tags = "Новые справочники")
+    @GetMapping("/sku")
+    public List<Sku> sku() {
+        return referenceService.getAllSku();
+    }
+
+    @Operation(tags = "Новые справочники")
+    @GetMapping("/price-source")
+    public List<PriceSource> priceSource() {
+        return referenceService.getAllPriceSource();
+    }
+
 
 
 
