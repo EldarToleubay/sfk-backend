@@ -23,6 +23,13 @@ public class UserReferenceService {
     private final PackQuantityRepository packQuantityRepository;
     private final SegmentRepository segmentRepository;
     private final TradeNameRepository tradeNameRepository;
+    private final PersonWithTradingLicenseRepository personWithTradingLicenseRepository;
+    private final PersonInterestedInRegistrationGeorgiaStandRepository personInterestedInRegistrationGeorgiaStandRepository;
+    private final InterestedPartyRepository interestedPartyRepository;
+    private final RxOtcRepository rxOtcRepository;
+    private final ModeOfRegistrationRepository modeOfRegistrationRepository;
+    private final SkuRepository skuRepository;
+    private final PriceSourceRepository priceSourceRepository;
 
 
     public List<Inn> getAllInnByAccess(Long userId) {
@@ -83,5 +90,41 @@ public class UserReferenceService {
         List<Long> ids = userAccessRepository.findRefIdsByUserIdAndRefType(userId, "TRADE_NAME");
         return tradeNameRepository.findByIdIn(ids);
     }
+
+    public List<PersonWithTradingLicense> getAllPersonWithTradingLicenseByAccess(Long userId) {
+        List<Long> ids = userAccessRepository.findRefIdsByUserIdAndRefType(userId, "PERSON_WITH_TRADING_LICENSE");
+        return personWithTradingLicenseRepository.findByIdIn(ids);
+    }
+
+    public List<PersonInterestedInRegistrationGeorgiaStand> getAllPersonInterestedInRegistrationGeorgiaStandByAccess(Long userId) {
+        List<Long> ids = userAccessRepository.findRefIdsByUserIdAndRefType(userId, "PERSON_INTERESTED_IN_REGISTRATION_GEORGIA_STAND");
+        return personInterestedInRegistrationGeorgiaStandRepository.findByIdIn(ids);
+    }
+
+    public List<InterestedParty> getAllInterestedPartyByAccess(Long userId) {
+        List<Long> ids = userAccessRepository.findRefIdsByUserIdAndRefType(userId, "INTERESTED_PARTY");
+        return interestedPartyRepository.findByIdIn(ids);
+    }
+
+    public List<RxOtc> getAllRxOtcByAccess(Long userId) {
+        List<Long> ids = userAccessRepository.findRefIdsByUserIdAndRefType(userId, "RX_OTC");
+        return rxOtcRepository.findByIdIn(ids);
+    }
+
+    public List<ModeOfRegistration> getAllModeOfRegistrationByAccess(Long userId) {
+        List<Long> ids = userAccessRepository.findRefIdsByUserIdAndRefType(userId, "MODE_OF_REGISTRATION");
+        return modeOfRegistrationRepository.findByIdIn(ids);
+    }
+
+    public List<Sku> getAllSkuByAccess(Long userId) {
+        List<Long> ids = userAccessRepository.findRefIdsByUserIdAndRefType(userId, "SKU");
+        return skuRepository.findByIdIn(ids);
+    }
+
+    public List<PriceSource> getAllPriceSourceByAccess(Long userId) {
+        List<Long> ids = userAccessRepository.findRefIdsByUserIdAndRefType(userId, "PRICE_SOURCE");
+        return priceSourceRepository.findByIdIn(ids);
+    }
+
 }
 
