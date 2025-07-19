@@ -96,6 +96,10 @@ public class DrugRepositoryImpl implements DrugRepositoryCustom {
     private List<Predicate> buildPredicates(CriteriaBuilder cb, Root<Drug> root, DrugFilterRequest filter) {
         List<Predicate> predicates = new ArrayList<>();
 
+
+        if (filter.getInn() != null && !filter.getInn().isEmpty()) {
+            predicates.add(root.get("year").in(filter.getYear()));
+        }
         if (filter.getInn() != null && !filter.getInn().isEmpty()) {
             predicates.add(root.get("inn").in(filter.getInn()));
         }
@@ -162,6 +166,7 @@ public class DrugRepositoryImpl implements DrugRepositoryCustom {
 
     private boolean isFilterEmpty(DrugFilterRequest filter) {
         return (filter.getInn().isEmpty() &&
+                filter.getYear().isEmpty() &&
                 filter.getSegment().isEmpty() &&
                 filter.getTradeName().isEmpty() &&
                 filter.getManufacturingCompany().isEmpty() &&

@@ -64,4 +64,7 @@ public interface DrugRepository extends JpaRepository<Drug, Long>, JpaSpecificat
     @Query("DELETE FROM Drug")
     void deleteAllFast();
 
+
+    @Query("SELECT DISTINCT d.year FROM Drug d WHERE d.year IS NOT NULL ORDER BY d.year")
+    List<String> findDistinctYear();
 }

@@ -171,6 +171,7 @@ public class DrugService {
     public List<DrugExportDto> fetchAllWithFilters(DrugFilterRequest request) {
         Specification<Drug> spec = Specification.where(null);
 
+        spec = addListFilter(spec, request.getYear(), "year");
         spec = addListFilter(spec, request.getInn(), "inn");
         spec = addListFilter(spec, request.getSegment(), "segment");
         spec = addListFilter(spec, request.getTradeName(), "tradeName");
@@ -231,7 +232,6 @@ public class DrugService {
                 ))
                 .toList();
     }
-
 
 
     private Specification<Drug> addListFilter(Specification<Drug> spec, List<String> values, String field) {

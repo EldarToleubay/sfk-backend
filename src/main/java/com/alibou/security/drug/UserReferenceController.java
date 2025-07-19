@@ -18,6 +18,11 @@ public class UserReferenceController {
 
     private final UserReferenceService referenceService;
 
+    @GetMapping("/year")
+    public List<Year> getAccessibleYear(@RequestParam Long userId) {
+        return referenceService.getAllYearByAccess(userId);
+    }
+
     @GetMapping("/inn")
     public List<Inn> getAccessibleInn(@RequestParam Long userId) {
         return referenceService.getAllInnByAccess(userId);

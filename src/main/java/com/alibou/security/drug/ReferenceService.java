@@ -32,6 +32,7 @@ public class ReferenceService {
     private final TradeNameRepository tradeNameRepository;
 
     // New Repositories
+    private final YearRepository yearRepository;
     private final PersonWithTradingLicenseRepository personWithTradingLicenseRepository;
     private final PersonInterestedInRegistrationGeorgiaStandRepository personInterestedInRegistrationGeorgiaStandRepository;
     private final InterestedPartyRepository interestedPartyRepository;
@@ -42,6 +43,13 @@ public class ReferenceService {
 
     @Transactional
     public void setAll() {
+
+        saveIfNotExists(drugRepository.findDistinctYear(), yearRepository.findAllNames(), yearRepository::saveAll, name -> {
+            Year entity = new Year();
+            entity.setName(name);
+            return entity;
+        }, "year");
+
         saveIfNotExists(drugRepository.findDistinctInn(), innRepository.findAllNames(), innRepository::saveAll, name -> {
             Inn entity = new Inn();
             entity.setName(name);
@@ -238,5 +246,9 @@ public class ReferenceService {
 
     public List<PriceSource> getAllPriceSource() {
         return priceSourceRepository.findAll();
+    }
+
+    public List<Year> getAllYear() {
+        return yearRepository.findAll();
     }
 }

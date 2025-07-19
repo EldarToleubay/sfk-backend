@@ -12,6 +12,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserReferenceService {
 
+    private final YearRepository yearRepository;
     private final UserAccessRepository userAccessRepository;
     private final InnRepository innRepository;
     private final Atc1Repository atc1Repository;
@@ -31,6 +32,11 @@ public class UserReferenceService {
     private final SkuRepository skuRepository;
     private final PriceSourceRepository priceSourceRepository;
 
+
+    public List<Year> getAllYearByAccess(Long userId) {
+        List<Long> ids = userAccessRepository.findRefIdsByUserIdAndRefType(userId, "YEAR");
+        return yearRepository.findByIdIn(ids);
+    }
 
     public List<Inn> getAllInnByAccess(Long userId) {
         List<Long> ids = userAccessRepository.findRefIdsByUserIdAndRefType(userId, "INN");

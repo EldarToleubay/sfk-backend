@@ -18,6 +18,11 @@ import java.util.List;
 public class ReferenceController {
 
     private final ReferenceService referenceService;
+    @GetMapping("/year")
+    public List<Year> years() {
+        return referenceService.getAllYear();
+    }
+
 
     @GetMapping("/inn")
     public List<Inn> inn() {
