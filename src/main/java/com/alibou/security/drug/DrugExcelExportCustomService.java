@@ -62,12 +62,17 @@ public class DrugExcelExportCustomService {
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Drugs");
 
+            CreationHelper creationHelper = workbook.getCreationHelper();
+            CellStyle dateCellStyle = workbook.createCellStyle();
+            short dateFormat = creationHelper.createDataFormat().getFormat("yyyy-mm-dd");
+            dateCellStyle.setDataFormat(dateFormat);
+
             createHeader(sheet, columns);
 
             int rowIdx = 1;
             for (DrugExportDto dto : drugs) {
                 Row row = sheet.createRow(rowIdx++);
-                fillRow(row, dto, columns);
+                fillRow(row, dto, columns, dateCellStyle);
             }
 
             for (int i = 0; i < columns.size(); i++) {
@@ -99,7 +104,7 @@ public class DrugExcelExportCustomService {
         }
     }
 
-    private void fillRow(Row row, DrugExportDto d, List<String> columns) {
+    private void fillRow(Row row, DrugExportDto d, List<String> columns, CellStyle dateCellStyle) {
         int i = 0;
         for (String col : columns) {
             Cell cell = row.createCell(i++);
@@ -114,10 +119,19 @@ public class DrugExcelExportCustomService {
                 case "atc1" -> cell.setCellValue(d.getAtc1());
                 case "atc2" -> cell.setCellValue(d.getAtc2());
                 case "atc3" -> cell.setCellValue(d.getAtc3());
-                case "importDate" -> cell.setCellValue(d.getImportDate() != null ? d.getImportDate().toString() : "");
+
+                case "importDate" -> {
+                    if (d.getImportDate() != null) {
+                        cell.setCellValue(java.util.Date.from(
+                                d.getImportDate().atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()));
+                        cell.setCellStyle(dateCellStyle);
+                    }
+                }
+
                 case "year" -> cell.setCellValue(d.getYear() != null ? d.getYear() : 0);
                 case "personWithTradingLicense" -> cell.setCellValue(d.getPersonWithTradingLicense());
-                case "personInterestedInRegistrationGeorgiaStand" -> cell.setCellValue(d.getPersonInterestedInRegistrationGeorgiaStand());
+                case "personInterestedInRegistrationGeorgiaStand" ->
+                        cell.setCellValue(d.getPersonInterestedInRegistrationGeorgiaStand());
                 case "interestedParty" -> cell.setCellValue(d.getInterestedParty());
                 case "rxOtc" -> cell.setCellValue(d.getRxOtc());
                 case "modeOfRegistration" -> cell.setCellValue(d.getModeOfRegistration());

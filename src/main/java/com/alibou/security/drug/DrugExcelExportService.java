@@ -19,11 +19,15 @@ public class DrugExcelExportService {
             // Создание заголовков
             createHeader(sheet);
 
+            CreationHelper creationHelper = workbook.getCreationHelper();
+            CellStyle dateCellStyle = workbook.createCellStyle();
+            dateCellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("yyyy-mm-dd"));
+
             // Заполнение строк
             int rowIdx = 1;
             for (DrugExportDto dto : drugs) {
                 Row row = sheet.createRow(rowIdx++);
-                fillRow(row, dto);
+                fillRow(row, dto, dateCellStyle);
             }
 
             // Автоширина всех 25 колонок
@@ -69,7 +73,7 @@ public class DrugExcelExportService {
     }
 
 
-    private void fillRow(Row row, DrugExportDto d) {
+    private void fillRow(Row row, DrugExportDto d, CellStyle dateCellStyle) {
         int i = 0;
         row.createCell(i++).setCellValue(d.getSegment());
         row.createCell(i++).setCellValue(d.getTradeName());
@@ -81,7 +85,15 @@ public class DrugExcelExportService {
         row.createCell(i++).setCellValue(d.getAtc1());
         row.createCell(i++).setCellValue(d.getAtc2());
         row.createCell(i++).setCellValue(d.getAtc3());
-        row.createCell(i++).setCellValue(d.getImportDate() != null ? d.getImportDate().toString() : "");
+
+        Cell dateCell = row.createCell(i++);
+        if (d.getImportDate() != null) {
+            dateCell.setCellValue(java.util.Date.from(
+                    d.getImportDate().atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()));
+            dateCell.setCellStyle(dateCellStyle);
+        }
+
+//        row.createCell(i++).setCellValue(d.getImportDate() != null ? d.getImportDate().toString() : "");
         row.createCell(i++).setCellValue(d.getYear() != null ? d.getYear() : 0);
         row.createCell(i++).setCellValue(d.getPersonWithTradingLicense());
         row.createCell(i++).setCellValue(d.getPersonInterestedInRegistrationGeorgiaStand());
